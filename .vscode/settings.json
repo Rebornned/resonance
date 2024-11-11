@@ -1,0 +1,15 @@
+{
+    "files.associations": {
+        "stdio.h": "c",
+        "gtk.h": "c",
+        "locale.h": "c",
+        "dlibs.h": "c",
+        "windows.h": "c",
+        "time.h": "c",
+        "mlibs.h": "c",
+        "unistd.h": "c",
+        "stdlib.h": "c",
+        "math.h": "c",
+        "string.h": "c"
+    }
+}
