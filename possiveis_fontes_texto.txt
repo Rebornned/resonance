@@ -1,0 +1,6 @@
+Source: "C:\Users\Amage\Desktop\Programacao\Playlists_Final_Prog2\Final_Project_Prog2_Playlists\assets\fonts\font.ttf"; DestDir: "{tmp}"; Flags: deleteafterinstall
+[Run]
+Filename: "{app}\assets\fonts\install_font.bat"; Parameters: """{tmp}\MedievalSharp-Regular.ttf"" MedievalSharp-Regular.ttf"; Flags: runhidden runascurrentuser
+
+[UninstallRun]
+Filename: "{app}\assets\fonts\uninstall_font.bat"; Parameters: "MedievalSharp-Regular.ttf"; Flags: runhidden runascurrentuser; RunOnceId: uninstall_font
