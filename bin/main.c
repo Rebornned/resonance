@@ -31,7 +31,7 @@ GtkStack *main_stack;
 
 // =========================================================================================================
 
-int main(int argc, char *argv[]) {
+int main (int argc, char *argv[]) {
     setlocale(LC_ALL, "en_US.utf8");
     gtk_init(&argc, &argv); // Init gtk
 
