@@ -5,6 +5,6 @@
 -- em exibir mostruário de músicas: função de excluir ou adicionar músicas no sistema +++++(feito)
 
 -- em exibir playlists: função de selecionar uma playlist ou criar uma playlist nova
----- em selecionar uma playlist: função de remover música, adicionar música, +++++(feito)
-                                 apagar playlist ou ordenar das 3 formas lá
+---- em selecionar uma playlist: função de remover música, adicionar música, apagar playlist +++++(feito)
+                                 ou ordenar das 3 formas lá
 ---- em criar uma nova playlist: função de selecionar os ids das músicas através de um vetor pra adicionar +++++(feito)
