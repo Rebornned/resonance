@@ -35,7 +35,9 @@ int id (const char *nome, const char *artista, int tempo);
 
 void gravador (void);
 
-void nova_playlist (void);
+void select_mostruario (playlist* pl);
+
+void nova_playlist (playlist *nova);
 
 void ord_nome ();
 

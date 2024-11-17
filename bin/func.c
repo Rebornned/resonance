@@ -102,40 +102,21 @@ void gravador (void) { // função para gravar as músicas no arq binário
 
 }
 
-void nova_playlist (playlist* nova, musica gravada) { // a lista vai ser criada aq
-
-    // colocar no final do id de cada musica na playlist um número indicando a ordem de inserção
-    gravada.id = add(gravada.id, nova->tamanho);
-
-    nodo* dado = (nodo*)malloc(sizeof(nodo));
-    if (!dado) printf("Erro ao alocar memoria.\n");
-
-    dado->dados = gravada;
-    dado->prox = NULL;
-
-    if (nova->inicio == NULL) {
-
-        nova->inicio = dado;
-        nova->fim = dado;
-
-    } else {
-
-        nova->fim->prox = dado;
-        nova->fim = dado;
-
-    }
-
-    nova->tamanho++;
-
-}
-
-void mostruario (playlist* pl) {
+musica select_mostruario (playlist *pl) { // seleciona as musicas pra adicionar na playlist
 
     FILE *gravados = fopen("gravados.dat", "rb");
     if (!gravados) printf("Nao foi possível abrir o arquivo de musicas.\n");
 
     musica aux;
-    int escolha, encontrou, continuar = 1;
+    musica *selecionadas = malloc(sizeof(musica) * (pl->tamanho+1)); // vetor de struct pra armazenar as musicas selecionadas
+    if (!selecionadas) {
+
+        printf("Erro ao alocar memoria para as músicas selecionadas.\n");
+        fclose(gravados);
+
+        return NULL;
+    }
+    int escolha, encontrou, continuar = 1, contador = -1;
 
     printf("\nDigite os IDs das musicas que deseja adicionar a playlist (pressione 0 para finalizar):\n");
 
@@ -158,33 +139,81 @@ void mostruario (playlist* pl) {
 
                 if (aux.id == escolha) {
 
-                    nova_playlist(pl, aux);  // Adiciona a música na playlist
+                    selecionadas[contador++] = aux;
                     printf("Música '%s' adicionada à playlist.\n", aux.nome);
                     encontrou = 1;
 
                     break;
                 }
 
-            }
+            } if (!encontrou) printf("ID %d não encontrado. Tente novamente.\n", escolha);
 
-            if (!encontrou) {
-                printf("ID %d não encontrado. Tente novamente.\n", escolha);
-            }
         }
+
     }
 
     fclose(gravados);
 
+    return *selecionadas;
+
 }
 
-void ord_nome (playlist* pl) { // vai receber a estrutura de lista como parametro
+void nova_playlist (playlist *nova) { // a lista vai ser criada aq
+
+    // colocar no final do id de cada musica na playlist um número indicando a ordem de inserção
+    //gravada.id = add(gravada.id, nova->tamanho);
+
+    musica *musicas_selecionadas = select_mostruario(nova); // Seleciona as músicas a serem adicionadas
+    if (!musicas_selecionadas) {
+
+        printf("Nenhuma música selecionada para adicionar à playlist.\n");
+        return;
+
+    }
+
+    for (int i = 0; musicas_selecionadas[i].id != 0; i++) {  // adiciona cada música selecionada
+
+        nodo *dado = (nodo*)malloc(sizeof(nodo));
+        if (!dado) {
+
+            printf("Erro ao alocar memoria.\n");
+            return;
+
+        }
+
+        musicas_selecionadas[i].id = add(musicas_selecionadas[i].id, i);
+
+        dado->dados = musicas_selecionadas[i]; // preenche com a música
+        dado->prox = NULL;
+
+        if (nova->inicio == NULL) {
+
+            nova->inicio = dado;
+            nova->fim = dado;
+
+        } else {
+
+            nova->fim->prox = dado;
+            nova->fim = dado;
+
+        }
+
+        nova->tamanho++;
+
+    }
+
+    free(musicas_selecionadas);
+
+}
+
+void ord_nome (playlist *pl) { // vai receber a estrutura de lista como parametro
 
     // a ideia é que a lista já vai ta ordenada em ordem de inserção,
     // então vai ser reorganizada de acordo com oq o usuario quer
 
 }
 
-void ord_artista (playlist* pl) { // vai receber a estrutura de lista como parametro
+void ord_artista (playlist *pl) { // vai receber a estrutura de lista como parametro
 
 
 
