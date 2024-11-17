@@ -25,8 +25,6 @@ Name: "{commondesktop}\Playlists"; Filename: "{app}\bin\main.exe"; IconFilename:
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Run]
-Filename: "{app}\assets\fonts\install_font.bat"; Parameters: """{tmp}\MedievalSharp-Regular.ttf"" MedievalSharp-Regular.ttf"; Flags: runhidden runascurrentuser
 Filename: "{app}\bin\main.exe"; Description: "{cm:LaunchProgram}"; Flags: nowait postinstall skipifsilent runhidden runascurrentuser
 
-[UninstallRun]
-Filename: "{app}\assets\fonts\uninstall_font.bat"; Parameters: "MedievalSharp-Regular.ttf"; Flags: runhidden runascurrentuser; RunOnceId: uninstall_font
+
