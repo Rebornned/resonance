@@ -1,0 +1,8 @@
+.btn_test {
+    box-shadow: none;
+    font-size: 0px;
+    outline: none;
+    border: none;
+    background-image: url('../ui_images/playlists.ico');
+    background-repeat: no-repeat;
+}

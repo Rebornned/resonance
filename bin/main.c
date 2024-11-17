@@ -18,7 +18,22 @@
 // +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=++=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=++=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 // Funções referentes a tela
 
+// Inicializações
 void registerSignals(GtkBuilder *builder);
+
+// -----------------------------------------------------------------
+
+// Animações
+void button_set_click_animation(GtkWidget *button); 
+gboolean button_click_animation(gpointer data);
+
+// --------------------------------------------------------------
+
+// Edição
+void change_label_text(GtkLabel *label, gchar *text);
+
+// -------------------------------------------------------------------
+
 // =======================================================================================================
 
 // -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*--*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -32,6 +47,8 @@ GtkStack *main_stack;
 // =========================================================================================================
 
 int main (int argc, char *argv[]) {
+    // Inicialização da tela
+    // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
     setlocale(LC_ALL, "en_US.utf8");
     gtk_init(&argc, &argv); // Init gtk
 
@@ -59,9 +76,18 @@ int main (int argc, char *argv[]) {
                                               GTK_STYLE_PROVIDER_PRIORITY_USER);
 
     
+    
+
+    // ================================================================================================
+
+    // Funções da tela
+    GtkLabel *label1 = GTK_LABEL(gtk_builder_get_object(builder, "label1"));
+    change_label_text(label1, "teste");
+    
+    // ************************************************************************************************
+
     // Registrando sinais de callback para botões executarem funções
     registerSignals(builder);
-
     //g_signal_connect(window, "map", G_CALLBACK(set_cursor_window), NULL);
 
     gtk_widget_show_all(window);
@@ -74,9 +100,23 @@ int main (int argc, char *argv[]) {
 
 void registerSignals(GtkBuilder *builder) {
     // Registrar sinais de callback
-    // Passa a main_stack como user_data
 
     // Frame 1 Botões
-    //GObject *fr1_btn_iniciar = gtk_builder_get_object(builder, "fr1_btn_start");
-    //g_signal_connect(fr1_btn_iniciar, "clicked", G_CALLBACK(switchPage), main_stack);
+    GObject *btn1 = gtk_builder_get_object(builder, "btn1");
+    g_signal_connect(btn1, "clicked", G_CALLBACK(button_set_click_animation), GTK_WIDGET(btn1));
+}
+
+void button_set_click_animation(GtkWidget *button) {
+    gtk_widget_set_opacity(button, 0.7);
+    g_timeout_add(100, button_click_animation, button);
+}
+
+gboolean button_click_animation(gpointer data) {
+    GtkWidget *button = GTK_WIDGET(data);
+    gtk_widget_set_opacity(button, 1.0);
+    return FALSE;
+}
+
+void change_label_text(GtkLabel *label, gchar *text) {
+    gtk_label_set_text(label, text);
 }

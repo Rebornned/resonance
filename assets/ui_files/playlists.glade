@@ -21,7 +21,8 @@
             <property name="visible">True</property>
             <property name="can-focus">False</property>
             <child>
-              <object class="GtkLabel">
+              <object class="GtkLabel" id="label1">
+                <property name="name">label1</property>
                 <property name="width-request">100</property>
                 <property name="height-request">80</property>
                 <property name="visible">True</property>
@@ -31,6 +32,24 @@
               <packing>
                 <property name="x">319</property>
                 <property name="y">273</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="btn1">
+                <property name="label" translatable="yes">button</property>
+                <property name="name">btn1</property>
+                <property name="width-request">100</property>
+                <property name="height-request">80</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <style>
+                  <class name="btn_test"/>
+                </style>
+              </object>
+              <packing>
+                <property name="x">449</property>
+                <property name="y">228</property>
               </packing>
             </child>
           </object>
