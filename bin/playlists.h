@@ -35,9 +35,14 @@ int id (const char *nome, const char *artista, int tempo);
 
 void gravador (void);
 
-void select_mostruario (playlist* pl);
+musica *select_mostruario (playlist* pl); // seleciona as músicas que o usuário
+// pedir num vetor (eu chamei tanto pra apagar quanto pra excluir as musicas selecionadas em outras funções)
 
-void nova_playlist (playlist *nova);
+void apagar_musica_bin (void);
+
+void add_playlist (playlist *nova);
+
+void apagar_playlist (playlist *pl);
 
 void ord_nome ();
 
