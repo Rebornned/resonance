@@ -1,0 +1,9 @@
+********* esquema das playlists
+
+- o usuário vai escolher inicialmente entre: exibir playlists ou exibir o mostruário de música
+
+-- em exibir mostruário de músicas: função de excluir ou adicionar músicas no sistema
+
+-- em exibir playlists: função de selecionar uma playlist ou criar uma playlist nova
+---- em selecionar uma playlist: função de remover música, adicionar música ou ordenar das 3 formas lá
+---- em criar uma nova playlist: função de selecionar os ids das músicas através de um vetor pra adicionar
