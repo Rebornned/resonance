@@ -6,7 +6,6 @@
 #include <glib.h>
 #include <direct.h>
 #include <math.h>
-#include "playlists.h"
 
 // ************************************************************************************************
 // Compilação necessária
