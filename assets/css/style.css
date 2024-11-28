@@ -1,8 +1,157 @@
-.btn_test {
+.universal_font {
+    font-family: "Joti One", serif;
+    font-weight: 400;
+    font-style: normal;
+
+    text-shadow: 
+        2px 2px 0px #000000,  
+        -2px -2px 0px #000000, 
+        -2px 2px 0px #000000,
+        2px -2px 0px #000000,  
+        2px 2px 2px #000000;  
+}
+
+.universal_background {
+    background-image: linear-gradient(#1C1C1C, #1C1C1C);
+}
+
+.universal_imgs {
     box-shadow: none;
     font-size: 0px;
     outline: none;
     border: none;
-    background-image: url('../ui_images/playlists.ico');
     background-repeat: no-repeat;
 }
+
+.universal_green_border {
+    border: solid 3px;
+    border-color: #1FD660;
+    border-radius: 15px;
+    background-image: linear-gradient(transparent, transparent);
+    box-shadow: 2px 0px 5px rgba(31, 214, 96, 0.3);
+}
+
+.universal_no_border {
+    border: none 0px;
+}
+
+.btn_sort {
+    background-image: url("../ui_images/sort_btn.png");
+}
+/*
+***************************************************************************************
+Telas
+*/
+/* Frame 2 - Principal */
+.fr1_arrow_left {
+    background-image: url("../ui_images/arrow_left.png");
+}
+
+.fr1_arrow_right {
+    background-image: url("../ui_images/arrow_right.png");
+}
+
+.border_0_radius {
+    border-radius: 0px;
+}
+
+/*
+======================================================================================
+Fonts size
+*/
+.font_size_96 {
+    font-size: 96px;
+}
+
+.font_size_64 {
+    font-size: 64px;
+}
+
+.font_size_48 {
+    font-size: 48px;
+}
+
+.font_size_48 {
+    font-size: 48px;
+}
+
+.font_size_40 {
+    font-size: 40px;
+}
+
+.font_size_32 {
+    font-size: 32px;
+}
+
+.font_size_24 {
+    font-size: 24px;
+}
+
+.font_size_20 {
+    font-size: 20px;
+}
+
+/*
+======================================================================================
+Scrollbar design
+*/
+
+scrollbar slider {
+    background-color: #555; 
+    border-radius: 10px; 
+    min-height: 20px; 
+}
+
+scrollbar {
+    background-color: transparent; 
+    border-radius: 10px;
+    margin: 0px;
+    border: 0px solid #ccc; 
+}
+
+scrollbar slider:hover {
+    background-color: #555; 
+}
+
+/*
+========================================================================================
+Cores
+*/
+.color_1FD660 {
+    color: #1FD660;
+}
+
+.color_FFFFFF {
+    color: #FFFFFF;
+}
+
+.color_FFFDDB {
+    color: #FFFDDB;
+}
+
+.color_FFE0D4 {
+    color: #FFE0D4;
+}
+
+.color_0A74FF {
+    color: #0A74FF;
+}
+
+.color_CB0000 {
+    color: #CB0000;
+}
+
+.color_FDF5E6 {
+    color: #FDF5E6;
+}
+
+.color_393939 {
+    color: #393939;
+}
+
+.color_0A6CFF {
+    color: #0A6CFF;
+}
+
+
+/*=====================================================================================*/

@@ -2,16 +2,23 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "playlists.h"
 
 /* A ordem das músicas armazenadas nas playlists importa e deve ser modificável, organizável das
  seguinte formas: em ordem de inclusão na playlist, em ordem alfabética de nome, em ordem
  alfabética de artista ou em ordem crescente de duração. */
+
+/* As estruturas não precisam ser declaradas neste arquivo, quando já foram declaradas no playlists.h
+Isso causou erros, por isso está comentado.
+
 typedef struct {
 
     char nome[200];
     char artista[200];
+    char album[400];
     int tempo;
     int id;
+    
 
 } musica;
 
@@ -29,6 +36,20 @@ typedef struct {
     int tamanho;
 
 } playlist;
+*/
+
+// ***********************************************************************************************
+// Assinaturas
+int musicsLength(FILE * pFile);
+musica * readMusicsvector(FILE *pFile);
+
+
+int main() {
+    for(int i=0; i < 5; i++) {
+        gravador();
+    }
+    return 0;
+}
 
 void ini_lista (playlist* nova) {
 
@@ -79,12 +100,16 @@ void gravador (void) { // função para gravar as músicas no arq binário
     musica nova;
     int v[1][2]; // tempo da musica antes de transformar em segundos
 
-    FILE *gravados = fopen("gravados.dat", "rb");
+    FILE *gravados = fopen("../files/musics_database.bin", "rb");
     if (gravados == NULL) printf("Nao foi possivel abrir o arquivo de musicas.");
 
     printf("Insira o nome da musica: \n");
     fgets(nova.nome, sizeof(nova.nome), stdin);
     nova.nome[strcspn(nova.nome, "\n")] = 0;
+
+    printf("Insira o nome do álbum: \n");
+    fgets(nova.album, sizeof(nova.album), stdin);
+    nova.album[strcspn(nova.album, "\n")] = 0;
 
     printf("Insira o nome do artista: \n");
     fgets(nova.artista, sizeof(nova.artista), stdin);
@@ -407,4 +432,32 @@ void ord_insercao (playlist *pl) {
     // n sei ainda como ver se são os 2 ultimos numeros ou 3 ou sla
 
 
+}
+
+musica * readMusicsvector(FILE *pFile) // Esta função lê o banco de músicas e retorna um vetor com as músicas
+{ 
+    int length = musicsLength(pFile);
+    rewind(pFile);
+
+    if(length > 0) {
+        musica * vector = (musica *) malloc (sizeof(musica) * length);
+        musica music;
+        if(!vector) {
+            // Allocation error
+            return NULL;
+        }
+        int count = 0;
+        while(fread(&music, sizeof(musica), 1, pFile) == 1) {
+            printf("%s, %d, %s, %d, %s", music.artista, music.id, music.nome, music.tempo, music.album);
+            vector[count++] = music;
+        }
+
+        rewind(pFile);
+        return vector;
+    }
+}
+
+int musicsLength(FILE *pFile) { // Esta função retorna a quantidade de músicas dentro do banco de músicas
+    rewind(pFile);
+    return ftell(pFile) / sizeof(musica);
 }

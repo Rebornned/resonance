@@ -6,6 +6,7 @@
 #include <glib.h>
 #include <direct.h>
 #include <math.h>
+#include "playlists.h"
 
 // ************************************************************************************************
 // Compilação necessária
@@ -19,6 +20,7 @@
 
 // Inicializações
 void registerSignals(GtkBuilder *builder);
+void switchPage(GtkButton *btn, gpointer user_data);
 
 // -----------------------------------------------------------------
 
@@ -43,6 +45,7 @@ GtkWidget *window;
 GtkBuilder *builder;
 GtkStack *main_stack;
 
+
 // =========================================================================================================
 
 int main (int argc, char *argv[]) {
@@ -59,7 +62,7 @@ int main (int argc, char *argv[]) {
 
     // Inicialização de objetos principais da interface
     window = GTK_WIDGET(gtk_builder_get_object(builder, "main_window"));
-    gtk_window_set_icon_from_file(GTK_WINDOW(window), "../assets/ui_images/playlists.ico", NULL);
+    gtk_window_set_icon_from_file(GTK_WINDOW(window), "../assets/ui_images/playlists_ico.png", NULL);
     g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL); // Fecha a tela
     
     GdkGeometry hints_window;
@@ -74,14 +77,14 @@ int main (int argc, char *argv[]) {
                                               GTK_STYLE_PROVIDER(css_provider),
                                               GTK_STYLE_PROVIDER_PRIORITY_USER);
 
-    
-    
+    // Main stack principal
+    main_stack = GTK_STACK(gtk_builder_get_object(builder, "main_stack"));
 
     // ================================================================================================
 
     // Funções da tela
-    GtkLabel *label1 = GTK_LABEL(gtk_builder_get_object(builder, "label1"));
-    change_label_text(label1, "teste");
+    //GtkLabel *label1 = GTK_LABEL(gtk_builder_get_object(builder, "label1"));
+    //change_label_text(label1, "teste");
     
     // ************************************************************************************************
 
@@ -96,14 +99,59 @@ int main (int argc, char *argv[]) {
 
     return 0;
 }
+/*
+================================================================================================ 
+Inicializations */
+
+void switchPage(GtkButton *btn, gpointer user_data) {
+    // Obtém o nome do botão clicado
+    const gchar *button_name = gtk_widget_get_name(GTK_WIDGET(btn));
+
+    /*// Frame 2 Elementos para limpar
+    GtkLabel *fr2_label_elements[] = {NULL};
+    GtkEntry *fr2_input_elements[] = {fr2_inp_user, fr2_inp_pass, NULL};
+
+    // Frame 3 Elementos para limpar
+    GtkLabel *fr3_label_elements[] = {NULL};
+    GtkEntry *fr3_input_elements[] = {NULL};
+
+    // Frame 5 Elementos para analisar e limpar
+    GtkEntry *fr5_cave_inp_name = GTK_ENTRY(gtk_builder_get_object(builder, "fr5_cave_inp_name"));
+    GtkLabel *fr5_cave_dragon_name_error = GTK_LABEL(gtk_builder_get_object(builder, "fr5_cave_dragon_name_error"));
+    */
+
+    // Altera a página visível da GtkStack com base no nome do botão
+    // Frame 1
+    if (g_strcmp0(button_name, "fr1_btn_music") == 0) {
+        button_set_click_animation(GTK_WIDGET(btn));
+        gtk_stack_set_visible_child_name(main_stack, "page_main");
+    }
+
+    if (g_strcmp0(button_name, "fr1_btn_playlist") == 0) {
+        gtk_stack_set_visible_child_name(main_stack, "page_main");
+    }
+}
 
 void registerSignals(GtkBuilder *builder) {
+
     // Registrar sinais de callback
 
     // Frame 1 Botões
-    GObject *btn1 = gtk_builder_get_object(builder, "btn1");
-    g_signal_connect(btn1, "clicked", G_CALLBACK(button_set_click_animation), GTK_WIDGET(btn1));
+    GObject *fr1_btn_music = gtk_builder_get_object(builder, "fr1_btn_music");
+    g_signal_connect(fr1_btn_music, "clicked", G_CALLBACK(switchPage), main_stack);
 }
+
+/**********************************************************************************************
+Settings 
+*/
+void setting_musics_list(int type, ) {
+
+}
+
+
+/*
+================================================================================================
+Animations */
 
 void button_set_click_animation(GtkWidget *button) {
     gtk_widget_set_opacity(button, 0.7);
@@ -116,6 +164,11 @@ gboolean button_click_animation(gpointer data) {
     return FALSE;
 }
 
+/***********************************************************************************************/
+/* Editions */
+
 void change_label_text(GtkLabel *label, gchar *text) {
     gtk_label_set_text(label, text);
 }
+
+/*=============================================================================================*/
