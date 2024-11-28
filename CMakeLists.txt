@@ -8,4 +8,6 @@ include_directories(bin)
 add_executable(Final_Project_Prog2_Playlists
         bin/func.c
         bin/main.c
+        bin/func.c
+        bin/func.c
 )

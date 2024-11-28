@@ -197,26 +197,23 @@ void apagar_musica_bin (void) { // excluir música do arquivo binario
         return;
     }
 
-    printf("ID: \n");
-    scanf("%d", &id_remove);
-
     for (int i = 0; musicas_selecionadas[i].id != 0; i++) { // percorre as músicas selecionadas
 
-        encontrou = 0;
+        int encontrou = 0;
         rewind(gravados);
 
         while (fread(&aux, sizeof(musica), 1, gravados)) {
 
-            if (aux.id == musicas_selecionadas[i].id) {
+            if (excluir.id == musicas_selecionadas[i].id) {
 
-                printf("Musica '%s' excluida.\n", aux.nome);
-                encontrado = 1;
+                printf("Musica '%s' excluida.\n", excluir.nome);
+                encontrou = 1;
 
                 break; // se encontrou a música, ignora a copia dela para o arquivo temporário
 
             } else fwrite(&aux, sizeof(musica), 1, aux); // caso a música não tenha sido selecionada para exclusão, copia para o arquivo temporário
 
-        } if (!encontrado) printf("Musica com ID %d noo encontrada para exclusao.\n", musicas_selecionadas[i].id);
+        } if (!encontrou) printf("Musica com ID %d noo encontrada para exclusao.\n", musicas_selecionadas[i].id);
 
     }
 
@@ -326,26 +323,26 @@ void remover_musica_playlist (playlist* pl) {
 
         for (int i = 0; selecionadas[i].id != 0; i++) {
 
-            if (atual->musica.id == selecionadas[i].id) {
+            if (atual->dados.id == selecionadas[i].id) {
 
                 encontrado = 1;
 
-                if (anterior == NULL) pl->inicio = atual->proximo; // caso a música a ser removida seja o primeiro nodo altera a cabeça da lista pro próximo nodo
-                else anterior->proximo = atual->proximo; // senão pula o nodo a ser removido
+                if (anterior == NULL) pl->inicio = atual->prox; // caso a música a ser removida seja o primeiro nodo altera a cabeça da lista pro próximo nodo
+                else anterior->prox = atual->prox; // senão pula o nodo a ser removido
 
                 free(atual);
-                printf("Musica com ID %d removida da playlist.\n", atual->musica.id);
+                printf("Musica com ID %d removida da playlist.\n", atual->dados.id);
 
                 break;
             }
 
         }
 
-        if (encontrado) atual = anterior ? anterior->proximo : pl->inicio;
+        if (encontrado) atual = anterior ? anterior->prox : pl->inicio;
         else { // avança o nodo porque n foi encontrado o id
 
             anterior = atual;
-            atual = atual->proximo;
+            atual = atual->prox;
 
         }
 
@@ -369,7 +366,7 @@ void apagar_playlist (playlist *pl) {
 
     while (atual != NULL) { // percorre toda a lista encadeada
 
-        proximo = atual->proximo; // armazena o próximo nodo
+        proximo = atual->prox; // armazena o próximo nodo
         free(atual);              // libera o nodo atual
         atual = proximo;          // avança para o próximo nodo
 
