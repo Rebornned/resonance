@@ -4,6 +4,7 @@
 typedef struct {
 
     char nome[200];
+    char album[400];
     char artista[200];
     int tempo;
     int id;
@@ -51,3 +52,9 @@ void ord_artista ();
 void ord_tempo ();
 
 #endif //FINAL_PROJECT_PROG2_PLAYLISTS_PLAYLISTS_H
+
+// ===========================================================================================
+// Funções de tratamento de arquivo
+
+musica * readMusicsvector(FILE *pFile);
+int musicsLength(FILE *pFile);
