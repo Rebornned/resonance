@@ -3,6 +3,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include "playlists.h"
+#include <unistd.h>
+#include <locale.h>
 
 /* A ordem das músicas armazenadas nas playlists importa e deve ser modificável, organizável das
  seguinte formas: em ordem de inclusão na playlist, em ordem alfabética de nome, em ordem
@@ -42,15 +44,28 @@ typedef struct {
 // Assinaturas
 int musicsLength(FILE * pFile);
 musica * readMusicsvector(FILE *pFile);
+void reinsFile(FILE *pFile);
+void bubbleTypeSort(musica *vector, int type, int size);
+int sortCompName(const void *a, const void *b);
+int sortCompArtist(const void *a, const void *b);
+int sortCompAlbum(const void *a, const void *b);
 
 
+/*
 int main() {
-    for(int i=0; i < 5; i++) {
-        gravador();
+    FILE *resetDatabase = fopen("../files/musics_database.bin", "rb+");
+    reinsFile(resetDatabase);
+
+    for(int i=0; i < 11; i++) {
+        gravador(i);
     }
+    printf("\n");
+    FILE *resetDatabaseNew = fopen("../files/musics_database.bin", "rb+");
+    musica * musicsVector = readMusicsvector(resetDatabaseNew);
+    
     return 0;
 }
-
+*/
 void ini_lista (playlist* nova) {
 
     nova->inicio = NULL;
@@ -91,38 +106,54 @@ int id (const char *nome, const char *artista, int tempo) { // aritmética para 
 
     for (int i = 0; artista[i] != '\0'; i++) ascii_artista *= (int)artista[i]; // converte o caractere para ASCII e multiplica
     n = add(n, ascii_artista);
-
     return n;
 }
 
-void gravador (void) { // função para gravar as músicas no arq binário
-
+void gravador (int index_num) { // função para gravar as músicas no arq binário
     musica nova;
     int v[1][2]; // tempo da musica antes de transformar em segundos
 
-    FILE *gravados = fopen("../files/musics_database.bin", "rb");
+    char inputStr[400];
+
+    FILE *gravados = fopen("../files/musics_database.bin", "ab+");
     if (gravados == NULL) printf("Nao foi possivel abrir o arquivo de musicas.");
 
-    printf("Insira o nome da musica: \n");
-    fgets(nova.nome, sizeof(nova.nome), stdin);
-    nova.nome[strcspn(nova.nome, "\n")] = 0;
+    scanf(" %[^\n]" ,inputStr);
+    strcpy(nova.nome, inputStr);
+    getchar();
 
-    printf("Insira o nome do álbum: \n");
-    fgets(nova.album, sizeof(nova.album), stdin);
-    nova.album[strcspn(nova.album, "\n")] = 0;
+    scanf(" %[^\n]" ,inputStr);
+    strcpy(nova.album, inputStr);
+    getchar();
 
-    printf("Insira o nome do artista: \n");
-    fgets(nova.artista, sizeof(nova.artista), stdin);
-    nova.artista[strcspn(nova.artista, "\n")] = 0;
-
-    printf("Insira o tempo da musica no formato [mm:ss]: \n");
+    scanf(" %[^\n]" ,inputStr);
+    strcpy(nova.artista, inputStr);
+    getchar();
+    
+    //printf("Insira o tempo da musica no formato [mm:ss]: \n");
     scanf("%d:%d", &v[0][0], &v[0][1]);
+    getchar();
+
+    //printf("Insira o nome da musica: \n");
+    //fgets(nova.nome, sizeof(nova.nome), stdin);
+    //nova.nome[strcspn(nova.nome, "\n")] = 0;
+
+    //printf("Insira o nome do álbum: \n");
+    //fgets(nova.album, sizeof(nova.album), stdin);
+    //nova.album[strcspn(nova.album, "\n")] = 0;
+
+    //printf("Insira o nome do artista: \n");
+    //fgets(nova.artista, sizeof(nova.artista), stdin);
+    //nova.artista[strcspn(nova.artista, "\n")] = 0;
+
 
     nova.tempo = segundos(v);
-    nova.id = id(nova.nome, nova.artista, nova.tempo);
-
-    fwrite(&nova, sizeof(musica), 1, gravados);
-
+    nova.id = index_num;
+    //nova.id = id(nova.nome, nova.artista, nova.tempo);
+    //printf("%s | %s | %d | %d | %s\n", nova.nome, nova.artista, nova.id, nova.tempo, nova.album);
+    if(fwrite(&nova, sizeof(musica), 1, gravados) == 1)
+        printf("Dados gravados com sucesso!\n");
+    
     fclose(gravados);
 
 }
@@ -222,26 +253,23 @@ void apagar_musica_bin (void) { // excluir música do arquivo binario
         return;
     }
 
-    printf("ID: \n");
-    scanf("%d", &id_remove);
-
     for (int i = 0; musicas_selecionadas[i].id != 0; i++) { // percorre as músicas selecionadas
 
-        encontrou = 0;
+        int encontrou = 0;
         rewind(gravados);
 
         while (fread(&aux, sizeof(musica), 1, gravados)) {
 
-            if (aux.id == musicas_selecionadas[i].id) {
+            if (excluir.id == musicas_selecionadas[i].id) {
 
-                printf("Musica '%s' excluida.\n", aux.nome);
-                encontrado = 1;
+                printf("Musica '%s' excluida.\n", excluir.nome);
+                encontrou = 1;
 
                 break; // se encontrou a música, ignora a copia dela para o arquivo temporário
 
             } else fwrite(&aux, sizeof(musica), 1, aux); // caso a música não tenha sido selecionada para exclusão, copia para o arquivo temporário
 
-        } if (!encontrado) printf("Musica com ID %d noo encontrada para exclusao.\n", musicas_selecionadas[i].id);
+        } if (!encontrou) printf("Musica com ID %d noo encontrada para exclusao.\n", musicas_selecionadas[i].id);
 
     }
 
@@ -351,26 +379,26 @@ void remover_musica_playlist (playlist* pl) {
 
         for (int i = 0; selecionadas[i].id != 0; i++) {
 
-            if (atual->musica.id == selecionadas[i].id) {
+            if (atual->dados.id == selecionadas[i].id) {
 
                 encontrado = 1;
 
-                if (anterior == NULL) pl->inicio = atual->proximo; // caso a música a ser removida seja o primeiro nodo altera a cabeça da lista pro próximo nodo
-                else anterior->proximo = atual->proximo; // senão pula o nodo a ser removido
+                if (anterior == NULL) pl->inicio = atual->prox; // caso a música a ser removida seja o primeiro nodo altera a cabeça da lista pro próximo nodo
+                else anterior->prox = atual->prox; // senão pula o nodo a ser removido
 
                 free(atual);
-                printf("Musica com ID %d removida da playlist.\n", atual->musica.id);
+                printf("Musica com ID %d removida da playlist.\n", atual->dados.id);
 
                 break;
             }
 
         }
 
-        if (encontrado) atual = anterior ? anterior->proximo : pl->inicio;
+        if (encontrado) atual = anterior ? anterior->prox : pl->inicio;
         else { // avança o nodo porque n foi encontrado o id
 
             anterior = atual;
-            atual = atual->proximo;
+            atual = atual->prox;
 
         }
 
@@ -394,7 +422,7 @@ void apagar_playlist (playlist *pl) {
 
     while (atual != NULL) { // percorre toda a lista encadeada
 
-        proximo = atual->proximo; // armazena o próximo nodo
+        proximo = atual->prox; // armazena o próximo nodo
         free(atual);              // libera o nodo atual
         atual = proximo;          // avança para o próximo nodo
 
@@ -407,35 +435,7 @@ void apagar_playlist (playlist *pl) {
     printf("A playlist foi apagada com sucesso.\n");
 }
 
-void ord_nome (playlist *pl) { // vai receber a estrutura de lista como parametro
-
-    // a ideia é que a lista já vai ta ordenada em ordem de inserção,
-    // então vai ser reorganizada de acordo com oq o usuario quer
-
-}
-
-void ord_artista (playlist *pl) { // vai receber a estrutura de lista como parametro
-
-
-
-}
-
-void ord_tempo (playlist *pl) { // vai receber a estrutura de lista como parametro
-
-
-
-}
-
-void ord_insercao (playlist *pl) {
-
-    // o ultimo numero da playlist é que indica a ordem que ele foi inserido na playlist
-    // n sei ainda como ver se são os 2 ultimos numeros ou 3 ou sla
-
-
-}
-
-musica * readMusicsvector(FILE *pFile) // Esta função lê o banco de músicas e retorna um vetor com as músicas
-{ 
+musica * readMusicsvector(FILE *pFile) { // Esta função lê o banco de músicas e retorna um vetor com as músicas 
     int length = musicsLength(pFile);
     rewind(pFile);
 
@@ -448,16 +448,87 @@ musica * readMusicsvector(FILE *pFile) // Esta função lê o banco de músicas 
         }
         int count = 0;
         while(fread(&music, sizeof(musica), 1, pFile) == 1) {
-            printf("%s, %d, %s, %d, %s", music.artista, music.id, music.nome, music.tempo, music.album);
+            //printf("Artista: %s| ID: %d | Musica: %s | Seconds: %d | Album: %s\n", music.artista, music.id, music.nome, music.tempo, music.album);
             vector[count++] = music;
         }
-
         rewind(pFile);
         return vector;
     }
 }
 
 int musicsLength(FILE *pFile) { // Esta função retorna a quantidade de músicas dentro do banco de músicas
-    rewind(pFile);
+    fseek(pFile, 0, SEEK_END);
     return ftell(pFile) / sizeof(musica);
+}
+
+void reinsFile(FILE *pFile) { // Reseta o arquivo binário
+    int fd = fileno(pFile);
+    ftruncate(fd, 0);
+    rewind(pFile);
+}
+
+void bubbleTypeSort(musica *vector, int type, int size) { // Um bubble sort capaz de sortear por diferentes condições
+    int ordened = 0, sortByValue1, sortByValue2;
+    musica aux, comp1, comp2;
+
+    while(ordened == 0) {
+        ordened = 1;
+    
+        for(int i=0; i < size-1; i++) {
+            comp1 = vector[i];
+            comp2 = vector[i+1];
+
+            switch (type)
+            {
+            case 1:
+                sortByValue1 = comp1.id;
+                sortByValue2 = comp2.id;
+                break;
+            case 2:
+                sortByValue1 = comp1.tempo;
+                sortByValue2 = comp2.tempo;
+                break;
+            case 3:
+                qsort(vector, size, sizeof(musica), sortCompName);
+                return;
+                break;
+            case 4:
+                qsort(vector, size, sizeof(musica), sortCompArtist);
+                return;
+                break;
+            case 5:
+                qsort(vector, size, sizeof(musica), sortCompAlbum);
+                return;
+                break;
+
+            default:
+                break;
+            }
+            if(sortByValue1 > sortByValue2) {
+                ordened = 0;
+                aux = vector[i];
+                vector[i] = vector[i+1];
+                vector[i+1] = aux;
+            }
+        }
+        size--;
+    }
+}
+
+int sortCompName(const void *a, const void *b) { // auxiliar de qsort para campo nome
+    const musica *musicaA = (const musica *)a;
+    const musica *musicaB = (const musica *)b;
+    return strcmp(musicaA->nome, musicaB->nome);
+}
+
+int sortCompArtist(const void *a, const void *b) { // auxiliar de qsort para campo artista
+    const musica *musicaA = (const musica *)a;
+    const musica *musicaB = (const musica *)b;
+    return strcmp(musicaA->artista, musicaB->artista);
+}
+
+int sortCompAlbum(const void *a, const void *b) { // auxiliar de qsort para campo album
+    const musica *musicaA = (const musica *)a;
+    const musica *musicaB = (const musica *)b;
+    return strcmp(musicaA->album, musicaB->album);
 }

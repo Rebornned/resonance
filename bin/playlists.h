@@ -34,7 +34,7 @@ int add (int base, int adicionar);
 
 int id (const char *nome, const char *artista, int tempo);
 
-void gravador (void);
+void gravador (int index_num);
 
 musica *select_mostruario (playlist* pl); // seleciona as músicas que o usuário
 // pedir num vetor (eu chamei tanto pra apagar quanto pra excluir as musicas selecionadas em outras funções)
@@ -58,3 +58,5 @@ void ord_tempo ();
 
 musica * readMusicsvector(FILE *pFile);
 int musicsLength(FILE *pFile);
+void bubbleTypeSort(musica *vector, int type, int size);
+void reinsFile(FILE *pFile);
