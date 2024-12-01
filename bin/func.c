@@ -5,6 +5,7 @@
 #include "playlists.h"
 #include <unistd.h>
 #include <locale.h>
+#include <ctype.h>
 
 /* A ordem das músicas armazenadas nas playlists importa e deve ser modificável, organizável das
  seguinte formas: em ordem de inclusão na playlist, em ordem alfabética de nome, em ordem
@@ -12,56 +13,65 @@
 
 /* As estruturas não precisam ser declaradas neste arquivo, quando já foram declaradas no playlists.h
 Isso causou erros, por isso está comentado.
-
-typedef struct {
-
-    char nome[200];
-    char artista[200];
-    char album[400];
-    int tempo;
-    int id;
-    
-
-} musica;
-
-typedef struct nodo {
-
-    musica dados;
-    struct nodo* prox;
-
-} nodo;
-
-typedef struct {
-
-    nodo* inicio;
-    nodo* fim;
-    int tamanho;
-
-} playlist;
 */
-
 // ***********************************************************************************************
 // Assinaturas
+
+// Files
 int musicsLength(FILE * pFile);
 musica * readMusicsvector(FILE *pFile);
 void reinsFile(FILE *pFile);
+int addNewMusicInPlaylist(musica music, FILE *pFile);
+int delNewMusicInPlaylist(musica music, FILE *pFile);
+int playlistFileExists(char *name);
+FILE * createNewPlaylistFile(char *name, FILE *controller);
+FILE * openPlaylistsController();
+int addPlaylistsController(char *name, FILE *controller);
+PlaylistData * readerPlaylistsController (FILE *pFile);
+int lengthPlaylistsController(FILE *pFile);
+int removePlaylistsController(char *name, FILE *controller, FILE *removeFile);
+int printMusicsInPlaylist(FILE *pFile);
+//=================================================================================================
+// Sort
+
 void bubbleTypeSort(musica *vector, int type, int size);
 int sortCompName(const void *a, const void *b);
 int sortCompArtist(const void *a, const void *b);
 int sortCompAlbum(const void *a, const void *b);
+//================================================================================================
+// Searchs
+int sequencialSearch(int num, int vector[], int length);
+int isMusicInVector(musica music, musica *vector, int length);
 
-
+//================================================================================================
+// Strings
+void validateString(const char *string, char *validate);
+char * adornString(const char *string);
+// ===============================================================================================
 /*
 int main() {
-    FILE *resetDatabase = fopen("../files/musics_database.bin", "rb+");
-    reinsFile(resetDatabase);
+    FILE *musicDatabase = fopen("../files/musics_database.bin", "rb+");
+    FILE * controller = openPlaylistsController();
+    //FILE *newPlaylist = createNewPlaylistFile("teste", controller);
+    FILE *removeFile = createNewPlaylistFile("Treino 2024", controller);
+    //printf("result: %d\n", removePlaylistsController("teste", controller, removeFile));
+    musica * musicsVector = readMusicsvector(musicDatabase);
+    //musica * playlistVector = readMusicsvector(removeFile);
+    //printf("remove: %d\n", removePlaylistsController("teste4", controller, removeFile));
+    printf("add: %d\n", addNewMusicInPlaylist(musicsVector[2], removeFile));
+    printf("add: %d\n", addNewMusicInPlaylist(musicsVector[2], removeFile));
+    printf("add: %d\n", addNewMusicInPlaylist(musicsVector[0], removeFile));
+    printf("add: %d\n", addNewMusicInPlaylist(musicsVector[1], removeFile));
+    printf("add: %d\n", addNewMusicInPlaylist(musicsVector[1], removeFile));
+    printMusicsInPlaylist(removeFile);
+    //printf("remove: %d\n", delNewMusicInPlaylist(musicsVector[0], removeFile));
 
+    /*
+    reinsFile(resetDatabase);
     for(int i=0; i < 11; i++) {
         gravador(i);
     }
     printf("\n");
-    FILE *resetDatabaseNew = fopen("../files/musics_database.bin", "rb+");
-    musica * musicsVector = readMusicsvector(resetDatabaseNew);
     
     return 0;
 }
@@ -435,6 +445,181 @@ void apagar_playlist (playlist *pl) {
     printf("A playlist foi apagada com sucesso.\n");
 }
 
+
+/*======================================================================================================
+Files*/
+
+// Playlist Controller
+FILE * openPlaylistsController() { // Cria o controlador de playlists caso ele não exista
+    FILE * controller;
+    if(!playlistFileExists("playlists_controller")) {
+        controller = fopen("../files/playlists/playlists_controller.bin", "wb+");
+    }
+    else
+        controller = fopen("../files/playlists/playlists_controller.bin", "ab+");
+    return controller;
+}
+
+int lengthPlaylistsController(FILE *pFile) { // Retorna a quantidade de playlists registradas no controlador
+    fseek(pFile, 0, SEEK_END);
+    return ftell(pFile) / sizeof(PlaylistData);
+}
+
+PlaylistData * readerPlaylistsController (FILE *pFile) { // Retorna um vetor com todas as playlists registradas no controle
+    int length = lengthPlaylistsController(pFile), count=0;
+    if(length > 0) {
+        PlaylistData * vector = malloc(sizeof(PlaylistData) * length);
+        PlaylistData index;
+        rewind(pFile);
+        while(fread(&index, sizeof(PlaylistData), 1, pFile) == 1)
+            vector[count++] = index;
+        rewind(pFile);
+        return vector;
+    }
+}
+
+int addPlaylistsController(char *name, FILE *controller) { // Adiciona uma nova playlist ao controlador
+    int length = lengthPlaylistsController(controller);
+    PlaylistData newPlaylist;
+    char validate_string[100];
+    strcpy(newPlaylist.name, name);
+
+    validateString(name, validate_string);
+    if(strcmp("error-NULL", validate_string) == 0) {
+        return -3; // String com caracteres inválidos
+    }
+
+    if(length > 0) {
+        PlaylistData *vector = readerPlaylistsController(controller);
+        for(int i=0; i < length; i++)
+            if(strcmp(name, vector[i].name) == 0) {
+                free(vector);
+                return -1; // Playlist já existente
+            }
+        free(vector);
+        fseek(controller, sizeof(PlaylistData) * length, SEEK_SET);
+    }
+    if(fwrite(&newPlaylist, sizeof(PlaylistData), 1, controller) != 1)
+        return -2;
+
+    return 1;
+}
+
+int removePlaylistsController(char *name, FILE *controller, FILE *removeFile) { // Remove uma playlist, tanto arquivo, quanto o registro
+    if(playlistFileExists(name)) {
+        char fileName[300];
+        snprintf(fileName, sizeof(fileName), "../files/playlists/playlist_%s.bin", name);
+        fclose(removeFile);
+        remove(fileName);
+
+        PlaylistData *vector = readerPlaylistsController(controller);
+        int length = lengthPlaylistsController(controller);
+        reinsFile(controller);
+        for(int i=0; i < length; i++) {
+            if(strcmp(name, vector[i].name) != 0)
+                if(fwrite(&vector[i], sizeof(PlaylistData), 1, controller) == 0)
+                    return -1;
+        }
+        free(vector);
+        return 1;
+    }
+    return -2;
+}
+
+int playlistFileExists(char *name) { // Verifica se a arquivo da playlist existe
+    char fileName[300];
+    if(strcmp(name, "playlists_controller") == 0)
+        strcpy(fileName, "../files/playlists/playlists_controller.bin");
+    else
+        snprintf(fileName, sizeof(fileName), "../files/playlists/playlist_%s.bin", name);
+    return access(fileName, F_OK) == 0; // Retorna 1 (existe) ou 0 (não existe)
+}
+
+FILE * createNewPlaylistFile(char *name, FILE *controller) { // Cria um novo arquivo de playlist, ou acessa caso ele já exista
+    char fileName[300], nameFormat[100];
+    FILE *pFile;
+    int result = addPlaylistsController(name, controller);
+    validateString(name, nameFormat);
+
+    snprintf(fileName, sizeof(fileName), "../files/playlists/playlist_%s.bin", nameFormat);
+    printf("Criação de playlist: result: %d\n\n", result);
+    if(result == 1) {
+        pFile = fopen(fileName, "wb+");
+    }
+    if(result == -1)
+        pFile = fopen(fileName, "ab+");
+    
+    return pFile;
+}
+
+// Playlists editors
+int printMusicsInPlaylist(FILE *pFile) { // Printa todas as músicas existentes na playlist
+    int length = musicsLength(pFile);
+    printf("=====================================================================\n");
+    if(length > 0) {
+        musica *vector = readMusicsvector(pFile);
+        for(int i=0; i < length; i++) {
+            printf("Name: %s | ID: %d\n", vector[i].nome, vector[i].id);
+        }
+        printf("=====================================================================\n");
+        return 1; // Playlist percorrida corretamente
+    }
+
+    return 0; // Playlist vazia
+}
+
+int addNewMusicInPlaylist(musica music, FILE *pFile) { // Adiciona uma nova música ao arquivo da playlist
+    int length = musicsLength(pFile);
+    if(length > 0) {
+        musica * vector = readMusicsvector(pFile);
+        if(!vector)
+                return -1; // Erro de alocação de memória
+        
+        for(int i=0; i < length; i++) {
+            if(music.id == vector[i].id) {
+                free(vector);
+                return -2; // Música já existente na playlist
+            }
+        }
+        free(vector);
+    }
+
+    fseek(pFile, length * sizeof(musica), SEEK_SET);
+    if(fwrite(&music, sizeof(musica), 1, pFile) == 1)
+        return 1; // Inserido com sucesso
+
+    return 0; // Erro ao inserir música
+}
+
+int delNewMusicInPlaylist(musica music, FILE *pFile) { // Retira uma música do arquivo da playlist
+    int lenght = musicsLength(pFile), finded = 0;
+    if(lenght > 0) {
+        musica *vector = readMusicsvector(pFile);
+        if(!vector)
+            return -1; // Erro de alocação de memória
+        reinsFile(pFile);
+        rewind(pFile);
+        for(int i=0; i<lenght; i++) {
+            if(music.id != vector[i].id) {
+                if(fwrite(&vector[i], sizeof(musica), 1, pFile) != 1) {
+                    free(vector);
+                    return -2; // Erro de escrita no arquivo
+                }
+            }
+            else {
+                finded = 1;
+            }
+        }
+
+        free(vector);
+        if(finded == 0)
+            return -3; // Música não existe na playlist
+        return 1; // Música apagada com sucesso
+    }
+    return 0; // Playlist vazia
+}
+//********************************************************************************************************
+// Musics functions
 musica * readMusicsvector(FILE *pFile) { // Esta função lê o banco de músicas e retorna um vetor com as músicas 
     int length = musicsLength(pFile);
     rewind(pFile);
@@ -467,6 +652,26 @@ void reinsFile(FILE *pFile) { // Reseta o arquivo binário
     rewind(pFile);
 }
 
+
+/* =========================================================================================================
+Searchs */
+int sequencialSearch(int num, int vector[], int length) {
+    for(int i=0; i < length; i++) 
+        if(num == vector[i])
+            return 1;
+    return 0;
+}
+
+int isMusicInVector(musica music, musica *vector, int length) {
+    for(int i=0; i < length; i++) {
+        if(music.id == vector[i].id)
+            return i;
+    }
+    return 0;
+}
+/*==========================================================================================================
+Sorts
+*/
 void bubbleTypeSort(musica *vector, int type, int size) { // Um bubble sort capaz de sortear por diferentes condições
     int ordened = 0, sortByValue1, sortByValue2;
     musica aux, comp1, comp2;
@@ -531,4 +736,35 @@ int sortCompAlbum(const void *a, const void *b) { // auxiliar de qsort para camp
     const musica *musicaA = (const musica *)a;
     const musica *musicaB = (const musica *)b;
     return strcmp(musicaA->album, musicaB->album);
+}
+
+/*========================================================================================================
+Strings
+*/
+void validateString(const char *string, char *validate) {
+    static char result[256]; 
+
+    strcpy(result, string);
+
+    for (int i = 0; result[i] != '\0'; i++) {
+        if (!isalnum((unsigned char)result[i]) && result[i] != ' ') {
+            strcpy(validate, "error-NULL");
+            return;
+        }
+        if (result[i] == ' ') {
+            result[i] = '_';
+        }
+    }
+    strcpy(validate, result);
+}
+
+char * adornString(const char *string) {
+    static char adornStr[256];
+    strcpy(adornStr, string);
+
+    for(int i=0; adornStr[i] != '\0'; i++) {
+        if(adornStr[i] == '_')
+            adornStr[i] = ' ';
+    }
+    return adornStr;
 }

@@ -26,6 +26,10 @@ typedef struct {
 
 } playlist;
 
+typedef struct {
+    char name[100];
+} PlaylistData;
+
 void ini_lista (playlist* nova);
 
 int segundos (int v[][2]);
@@ -56,7 +60,30 @@ void ord_tempo ();
 // ===========================================================================================
 // Funções de tratamento de arquivo
 
+// Files
+int musicsLength(FILE * pFile);
 musica * readMusicsvector(FILE *pFile);
-int musicsLength(FILE *pFile);
-void bubbleTypeSort(musica *vector, int type, int size);
 void reinsFile(FILE *pFile);
+int addNewMusicInPlaylist(musica music, FILE *pFile);
+int delNewMusicInPlaylist(musica music, FILE *pFile);
+int playlistFileExists(char *name);
+FILE * createNewPlaylistFile(char *name, FILE *controller);
+FILE * openPlaylistsController();
+int addPlaylistsController(char *name, FILE *controller);
+PlaylistData * readerPlaylistsController (FILE *pFile);
+int lengthPlaylistsController(FILE *pFile);
+int removePlaylistsController(char *name, FILE *controller, FILE *removeFile);
+int printMusicsInPlaylist(FILE *pFile);
+//=================================================================================================
+// Sort
+
+void bubbleTypeSort(musica *vector, int type, int size);
+int sortCompName(const void *a, const void *b);
+int sortCompArtist(const void *a, const void *b);
+int sortCompAlbum(const void *a, const void *b);
+//================================================================================================
+// Searchs
+int sequencialSearch(int num, int vector[], int length);
+int isMusicInVector(musica music, musica *vector, int length);
+
+//================================================================================================
