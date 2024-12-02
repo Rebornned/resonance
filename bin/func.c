@@ -24,8 +24,9 @@ void reinsFile(FILE *pFile);
 int addNewMusicInPlaylist(musica music, FILE *pFile);
 int delNewMusicInPlaylist(musica music, FILE *pFile);
 int playlistFileExists(char *name);
-FILE * createNewPlaylistFile(char *name, FILE *controller);
+int createNewPlaylistFile(char *name, FILE *controller);
 FILE * openPlaylistsController();
+FILE * acessPlaylistFile(char *name);
 int addPlaylistsController(char *name, FILE *controller);
 PlaylistData * readerPlaylistsController (FILE *pFile);
 int lengthPlaylistsController(FILE *pFile);
@@ -52,19 +53,26 @@ char * adornString(const char *string);
 int main() {
     FILE *musicDatabase = fopen("../files/musics_database.bin", "rb+");
     FILE * controller = openPlaylistsController();
-    //FILE *newPlaylist = createNewPlaylistFile("teste", controller);
-    FILE *removeFile = createNewPlaylistFile("Treino 2024", controller);
-    //printf("result: %d\n", removePlaylistsController("teste", controller, removeFile));
+    //printf("Criacao playlist: %d\n", createNewPlaylistFile("Treino 2024", controller));
+    //printf("Criacao playlist: %d\n", createNewPlaylistFile("Treino 2025", controller));
+
+    FILE *newPlaylistFile = acessPlaylistFile("Tudo dorme");
+
     musica * musicsVector = readMusicsvector(musicDatabase);
-    //musica * playlistVector = readMusicsvector(removeFile);
-    //printf("remove: %d\n", removePlaylistsController("teste4", controller, removeFile));
-    printf("add: %d\n", addNewMusicInPlaylist(musicsVector[2], removeFile));
-    printf("add: %d\n", addNewMusicInPlaylist(musicsVector[2], removeFile));
-    printf("add: %d\n", addNewMusicInPlaylist(musicsVector[0], removeFile));
-    printf("add: %d\n", addNewMusicInPlaylist(musicsVector[1], removeFile));
-    printf("add: %d\n", addNewMusicInPlaylist(musicsVector[1], removeFile));
-    printMusicsInPlaylist(removeFile);
-    //printf("remove: %d\n", delNewMusicInPlaylist(musicsVector[0], removeFile));
+
+    printf("add: %d\n", addNewMusicInPlaylist(musicsVector[2], newPlaylistFile));
+    printf("add: %d\n", addNewMusicInPlaylist(musicsVector[4], newPlaylistFile));
+    printf("add: %d\n", addNewMusicInPlaylist(musicsVector[0], newPlaylistFile));
+    printf("add: %d\n", addNewMusicInPlaylist(musicsVector[1], newPlaylistFile));
+    printf("add: %d\n", addNewMusicInPlaylist(musicsVector[5], newPlaylistFile));
+    printf("add: %d\n", addNewMusicInPlaylist(musicsVector[7], newPlaylistFile));
+    //printf("add: %d\n", addNewMusicInPlaylist(musicsVector[1], newPlaylistFile));
+    printMusicsInPlaylist(newPlaylistFile);    
+    fclose(newPlaylistFile);
+    //printf("remove: %d\n", delNewMusicInPlaylist(musicsVector[0], newPlaylistFile));
+    //printf("result: %d\n", removePlaylistsController("Treino 2024", controller, newPlaylistFile));
+
+    //printMusicsInPlaylist(newPlaylistFile);    
 
     /*
     reinsFile(resetDatabase);
@@ -74,8 +82,8 @@ int main() {
     printf("\n");
     
     return 0;
-}
-*/
+}*/
+
 void ini_lista (playlist* nova) {
 
     nova->inicio = NULL;
@@ -507,8 +515,9 @@ int addPlaylistsController(char *name, FILE *controller) { // Adiciona uma nova 
 
 int removePlaylistsController(char *name, FILE *controller, FILE *removeFile) { // Remove uma playlist, tanto arquivo, quanto o registro
     if(playlistFileExists(name)) {
-        char fileName[300];
-        snprintf(fileName, sizeof(fileName), "../files/playlists/playlist_%s.bin", name);
+        char fileName[300], nameFormat[100];
+        validateString(name, nameFormat);
+        snprintf(fileName, sizeof(fileName), "../files/playlists/playlist_%s.bin", nameFormat);
         fclose(removeFile);
         remove(fileName);
 
@@ -518,38 +527,49 @@ int removePlaylistsController(char *name, FILE *controller, FILE *removeFile) { 
         for(int i=0; i < length; i++) {
             if(strcmp(name, vector[i].name) != 0)
                 if(fwrite(&vector[i], sizeof(PlaylistData), 1, controller) == 0)
-                    return -1;
+                    return -1; // Erro de reescrita do controlador
         }
         free(vector);
-        return 1;
+        return 1; // Playlist apagada com sucesso
     }
-    return -2;
+    return -2; // Playlist inexistente
 }
 
 int playlistFileExists(char *name) { // Verifica se a arquivo da playlist existe
-    char fileName[300];
+    char fileName[300], nameFormat[100];
+    validateString(name, nameFormat);
     if(strcmp(name, "playlists_controller") == 0)
         strcpy(fileName, "../files/playlists/playlists_controller.bin");
     else
-        snprintf(fileName, sizeof(fileName), "../files/playlists/playlist_%s.bin", name);
+        snprintf(fileName, sizeof(fileName), "../files/playlists/playlist_%s.bin", nameFormat);
     return access(fileName, F_OK) == 0; // Retorna 1 (existe) ou 0 (não existe)
 }
 
-FILE * createNewPlaylistFile(char *name, FILE *controller) { // Cria um novo arquivo de playlist, ou acessa caso ele já exista
+int createNewPlaylistFile(char *name, FILE *controller) { // Cria um novo arquivo de playlist, ou acessa caso ele já exista
     char fileName[300], nameFormat[100];
     FILE *pFile;
     int result = addPlaylistsController(name, controller);
     validateString(name, nameFormat);
 
     snprintf(fileName, sizeof(fileName), "../files/playlists/playlist_%s.bin", nameFormat);
-    printf("Criação de playlist: result: %d\n\n", result);
     if(result == 1) {
         pFile = fopen(fileName, "wb+");
     }
     if(result == -1)
         pFile = fopen(fileName, "ab+");
-    
-    return pFile;
+    fclose(pFile);
+    return result;
+}
+
+FILE * acessPlaylistFile(char *name) {
+    char fileName[300], nameFormat[100];
+    validateString(name, nameFormat);
+    snprintf(fileName, sizeof(fileName), "../files/playlists/playlist_%s.bin", nameFormat);
+
+    if(playlistFileExists(name)) {
+        return fopen(fileName, "ab+");
+    }
+    return NULL; // Erro de acesso ao arquivo
 }
 
 // Playlists editors
@@ -652,7 +672,6 @@ void reinsFile(FILE *pFile) { // Reseta o arquivo binário
     rewind(pFile);
 }
 
-
 /* =========================================================================================================
 Searchs */
 int sequencialSearch(int num, int vector[], int length) {
@@ -675,6 +694,8 @@ Sorts
 void bubbleTypeSort(musica *vector, int type, int size) { // Um bubble sort capaz de sortear por diferentes condições
     int ordened = 0, sortByValue1, sortByValue2;
     musica aux, comp1, comp2;
+    if(size < 1)
+        return;
 
     while(ordened == 0) {
         ordened = 1;

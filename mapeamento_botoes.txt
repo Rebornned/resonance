@@ -1,0 +1,13 @@
+btn_buttons position 
+x = 344
+y = 146 + index * 60
+height = 29
+width = 29
+
+label text
+x = 0
+y = 131 + index * 60
+
+universal_green_border
+border_0_radius
+fr2_btns_musics_list_border

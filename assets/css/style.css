@@ -99,6 +99,24 @@ Telas
     background-image: url("../ui_images/cancel.png");
 }
 
+/* ================================================================================= 
+Frame 2 - Acesso 
+*/
+.fr2_new_music {
+    background-image: url("../ui_images/new_music.png");
+}
+
+.fr2_btn_buttons {
+    background-image: url("../ui_images/buttons.png");
+}
+
+.fr2_playlist_back {
+    background-image: url("../ui_images/playlist_back.png");
+}
+
+.fr2_playlist_add {
+    background-image: url("../ui_images/playlist_add.png");
+}
 /*
 ======================================================================================
 Fonts size

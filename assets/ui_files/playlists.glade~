@@ -118,7 +118,7 @@
                 <property name="height-request">435</property>
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="transition-duration">400</property>
+                <property name="transition-type">crossfade</property>
                 <child>
                   <object class="GtkFixed" id="fr2_playlist">
                     <property name="name">fr2_playlist</property>
@@ -126,7 +126,7 @@
                     <property name="can-focus">False</property>
                     <child>
                       <object class="GtkScrolledWindow">
-                        <property name="width-request">673</property>
+                        <property name="width-request">690</property>
                         <property name="height-request">302</property>
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
@@ -313,8 +313,9 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkButton">
+                      <object class="GtkButton" id="fr2_btn_delete_playlist">
                         <property name="label" translatable="yes">Apagar</property>
+                        <property name="name">fr2_btn_delete_playlist</property>
                         <property name="width-request">113</property>
                         <property name="height-request">39</property>
                         <property name="visible">True</property>
@@ -329,12 +330,13 @@
                       </object>
                       <packing>
                         <property name="x">365</property>
-                        <property name="y">396</property>
+                        <property name="y">394</property>
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkButton">
+                      <object class="GtkButton" id="fr2_btn_access_playlist">
                         <property name="label" translatable="yes">Acessar</property>
+                        <property name="name">fr2_btn_access_playlist</property>
                         <property name="width-request">113</property>
                         <property name="height-request">39</property>
                         <property name="visible">True</property>
@@ -349,13 +351,750 @@
                       </object>
                       <packing>
                         <property name="x">512</property>
-                        <property name="y">396</property>
+                        <property name="y">394</property>
                       </packing>
                     </child>
                   </object>
                   <packing>
                     <property name="name">page_playlist</property>
                     <property name="title" translatable="yes">page_playlist</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkFixed" id="fr2_access">
+                    <property name="name">fr2_access</property>
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <child>
+                      <object class="GtkLabel" id="fr2_playlist_list_border2">
+                        <property name="width-request">392</property>
+                        <property name="height-request">380</property>
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <style>
+                          <class name="universal_green_border"/>
+                          <class name="border_0_radius"/>
+                        </style>
+                      </object>
+                      <packing>
+                        <property name="x">304</property>
+                        <property name="y">53</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="fr2_btn_access_back">
+                        <property name="label" translatable="yes">Voltar</property>
+                        <property name="name">fr2_btn_access_back</property>
+                        <property name="width-request">127</property>
+                        <property name="height-request">49</property>
+                        <property name="visible">True</property>
+                        <property name="can-focus">True</property>
+                        <property name="receives-default">True</property>
+                        <style>
+                          <class name="universal_font"/>
+                          <class name="font_size_24"/>
+                          <class name="color_FFFDDB"/>
+                          <class name="fr2_btns_playlist_list_border"/>
+                        </style>
+                      </object>
+                      <packing>
+                        <property name="x">135</property>
+                        <property name="y">57</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="fr2_btn_playlist_music_sort">
+                        <property name="name">fr2_btn_playlist_music_sort</property>
+                        <property name="width-request">48</property>
+                        <property name="height-request">42</property>
+                        <property name="visible">True</property>
+                        <property name="can-focus">True</property>
+                        <property name="receives-default">True</property>
+                        <style>
+                          <class name="universal_imgs"/>
+                          <class name="btn_sort"/>
+                        </style>
+                      </object>
+                      <packing>
+                        <property name="x">305</property>
+                        <property name="y">6</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkStack" id="fr2_stack_access">
+                        <property name="name">fr2_stack_access</property>
+                        <property name="width-request">392</property>
+                        <property name="height-request">377</property>
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="transition-type">crossfade</property>
+                        <child>
+                          <object class="GtkFixed" id="fr2_access_list">
+                            <property name="name">fr2_access_list</property>
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <child>
+                              <object class="GtkScrolledWindow">
+                                <property name="width-request">410</property>
+                                <property name="height-request">362</property>
+                                <property name="visible">True</property>
+                                <property name="can-focus">True</property>
+                                <property name="shadow-type">in</property>
+                                <child>
+                                  <object class="GtkViewport">
+                                    <property name="width-request">255</property>
+                                    <property name="height-request">380</property>
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <child>
+                                      <object class="GtkFixed" id="fr2_access_list_fixed">
+                                        <property name="name">fr2_access_list_fixed</property>
+                                        <property name="width-request">32</property>
+                                        <property name="height-request">32</property>
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">False</property>
+                                        <child>
+                                          <object class="GtkLabel" id="fr2_playlist_view_name">
+                                            <property name="name">fr2_playlist_view_name</property>
+                                            <property name="width-request">390</property>
+                                            <property name="height-request">61</property>
+                                            <property name="visible">True</property>
+                                            <property name="can-focus">False</property>
+                                            <property name="halign">start</property>
+                                            <property name="valign">start</property>
+                                            <property name="label" translatable="yes">Ariana grande</property>
+                                            <property name="wrap">True</property>
+                                            <style>
+                                              <class name="universal_font"/>
+                                              <class name="color_0A6CFF"/>
+                                              <class name="font_size_32"/>
+                                            </style>
+                                          </object>
+                                        </child>
+                                        <child>
+                                          <object class="GtkButton" id="fr2_btn_add_music">
+                                            <property name="name">fr2_btn_add_music</property>
+                                            <property name="width-request">390</property>
+                                            <property name="height-request">61</property>
+                                            <property name="visible">True</property>
+                                            <property name="can-focus">True</property>
+                                            <property name="receives-default">True</property>
+                                            <style>
+                                              <class name="universal_imgs"/>
+                                              <class name="fr2_new_music"/>
+                                              <class name="universal_green_border"/>
+                                              <class name="border_0_radius"/>
+                                              <class name="fr2_btns_musics_list_border"/>
+                                            </style>
+                                          </object>
+                                          <packing>
+                                            <property name="y">61</property>
+                                          </packing>
+                                        </child>
+                                      </object>
+                                    </child>
+                                  </object>
+                                </child>
+                                <style>
+                                  <class name="universal_no_border"/>
+                                </style>
+                              </object>
+                            </child>
+                          </object>
+                          <packing>
+                            <property name="name">page_access_list</property>
+                            <property name="title" translatable="yes">page_access_list</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkFixed" id="fr2_access_add">
+                            <property name="name">fr2_access_add</property>
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <child>
+                              <object class="GtkScrolledWindow">
+                                <property name="width-request">392</property>
+                                <property name="height-request">374</property>
+                                <property name="visible">True</property>
+                                <property name="can-focus">True</property>
+                                <property name="shadow-type">in</property>
+                                <child>
+                                  <object class="GtkViewport">
+                                    <property name="width-request">255</property>
+                                    <property name="height-request">380</property>
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <child>
+                                      <object class="GtkFixed" id="fr2_access_add_fixed">
+                                        <property name="name">fr2_access_add_fixed</property>
+                                        <property name="width-request">32</property>
+                                        <property name="height-request">32</property>
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">False</property>
+                                        <child>
+                                          <object class="GtkLabel" id="fr2_access_label_add">
+                                            <property name="name">fr2_access_label_add</property>
+                                            <property name="width-request">390</property>
+                                            <property name="height-request">68</property>
+                                            <property name="visible">True</property>
+                                            <property name="can-focus">False</property>
+                                            <property name="halign">start</property>
+                                            <property name="valign">start</property>
+                                            <property name="label" translatable="yes">Adicionar a esta playlist</property>
+                                            <property name="wrap">True</property>
+                                            <style>
+                                              <class name="universal_font"/>
+                                              <class name="color_FDF5E6"/>
+                                              <class name="font_size_20"/>
+                                            </style>
+                                          </object>
+                                        </child>
+                                        <child>
+                                          <object class="GtkLabel" id="fr2_music_actual_sort2">
+                                            <property name="name">fr2_music_actual_sort</property>
+                                            <property name="width-request">390</property>
+                                            <property name="height-request">60</property>
+                                            <property name="visible">True</property>
+                                            <property name="can-focus">False</property>
+                                            <property name="halign">start</property>
+                                            <property name="valign">start</property>
+                                            <property name="label" translatable="yes">God is woman</property>
+                                            <property name="wrap">True</property>
+                                            <style>
+                                              <class name="universal_font"/>
+                                              <class name="color_FFFFFF"/>
+                                              <class name="font_size_24"/>
+                                              <class name="universal_green_border"/>
+                                              <class name="border_0_radius"/>
+                                              <class name="fr2_btns_musics_list_border"/>
+                                            </style>
+                                          </object>
+                                          <packing>
+                                            <property name="y">127</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <object class="GtkButton" id="fr2_btn_musics_sort8">
+                                            <property name="name">fr2_btn_musics_sort</property>
+                                            <property name="width-request">38</property>
+                                            <property name="height-request">38</property>
+                                            <property name="visible">True</property>
+                                            <property name="can-focus">True</property>
+                                            <property name="receives-default">True</property>
+                                            <style>
+                                              <class name="universal_imgs"/>
+                                              <class name="fr2_playlist_add"/>
+                                            </style>
+                                          </object>
+                                          <packing>
+                                            <property name="x">336</property>
+                                            <property name="y">143</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <object class="GtkLabel" id="fr2_music_actual_sort3">
+                                            <property name="name">fr2_music_actual_sort</property>
+                                            <property name="width-request">390</property>
+                                            <property name="height-request">60</property>
+                                            <property name="visible">True</property>
+                                            <property name="can-focus">False</property>
+                                            <property name="has-tooltip">True</property>
+                                            <property name="halign">start</property>
+                                            <property name="valign">start</property>
+                                            <property name="label" translatable="yes">God is woman</property>
+                                            <property name="wrap">True</property>
+                                            <style>
+                                              <class name="universal_font"/>
+                                              <class name="color_FFFFFF"/>
+                                              <class name="font_size_24"/>
+                                              <class name="universal_green_border"/>
+                                              <class name="border_0_radius"/>
+                                              <class name="fr2_btns_musics_list_border"/>
+                                            </style>
+                                          </object>
+                                          <packing>
+                                            <property name="y">187</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <object class="GtkButton" id="fr2_btn_musics_sort9">
+                                            <property name="name">fr2_btn_musics_sort</property>
+                                            <property name="width-request">38</property>
+                                            <property name="height-request">38</property>
+                                            <property name="visible">True</property>
+                                            <property name="can-focus">True</property>
+                                            <property name="receives-default">True</property>
+                                            <style>
+                                              <class name="universal_imgs"/>
+                                              <class name="fr2_playlist_add"/>
+                                            </style>
+                                          </object>
+                                          <packing>
+                                            <property name="x">336</property>
+                                            <property name="y">203</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <object class="GtkLabel" id="fr2_music_actual_sort9">
+                                            <property name="name">fr2_music_actual_sort</property>
+                                            <property name="width-request">390</property>
+                                            <property name="height-request">60</property>
+                                            <property name="visible">True</property>
+                                            <property name="can-focus">False</property>
+                                            <property name="has-tooltip">True</property>
+                                            <property name="halign">start</property>
+                                            <property name="valign">start</property>
+                                            <property name="label" translatable="yes">God is woman</property>
+                                            <property name="wrap">True</property>
+                                            <style>
+                                              <class name="universal_font"/>
+                                              <class name="color_FFFFFF"/>
+                                              <class name="font_size_24"/>
+                                              <class name="universal_green_border"/>
+                                              <class name="border_0_radius"/>
+                                              <class name="fr2_btns_musics_list_border"/>
+                                            </style>
+                                          </object>
+                                          <packing>
+                                            <property name="y">247</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <object class="GtkButton" id="fr2_btn_musics_sort10">
+                                            <property name="name">fr2_btn_musics_sort</property>
+                                            <property name="width-request">38</property>
+                                            <property name="height-request">38</property>
+                                            <property name="visible">True</property>
+                                            <property name="can-focus">True</property>
+                                            <property name="receives-default">True</property>
+                                            <style>
+                                              <class name="universal_imgs"/>
+                                              <class name="fr2_playlist_add"/>
+                                            </style>
+                                          </object>
+                                          <packing>
+                                            <property name="x">336</property>
+                                            <property name="y">263</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <object class="GtkLabel" id="fr2_music_actual_sort11">
+                                            <property name="name">fr2_music_actual_sort</property>
+                                            <property name="width-request">390</property>
+                                            <property name="height-request">60</property>
+                                            <property name="visible">True</property>
+                                            <property name="can-focus">False</property>
+                                            <property name="has-tooltip">True</property>
+                                            <property name="halign">start</property>
+                                            <property name="valign">start</property>
+                                            <property name="label" translatable="yes">God is woman</property>
+                                            <property name="wrap">True</property>
+                                            <style>
+                                              <class name="universal_font"/>
+                                              <class name="color_FFFFFF"/>
+                                              <class name="font_size_24"/>
+                                              <class name="universal_green_border"/>
+                                              <class name="border_0_radius"/>
+                                              <class name="fr2_btns_musics_list_border"/>
+                                            </style>
+                                          </object>
+                                          <packing>
+                                            <property name="y">305</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <object class="GtkButton" id="fr2_btn_musics_sort11">
+                                            <property name="name">fr2_btn_musics_sort</property>
+                                            <property name="width-request">38</property>
+                                            <property name="height-request">38</property>
+                                            <property name="visible">True</property>
+                                            <property name="can-focus">True</property>
+                                            <property name="receives-default">True</property>
+                                            <style>
+                                              <class name="universal_imgs"/>
+                                              <class name="fr2_playlist_add"/>
+                                            </style>
+                                          </object>
+                                          <packing>
+                                            <property name="x">336</property>
+                                            <property name="y">318</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <object class="GtkButton" id="fr2_btn_access_add_back">
+                                            <property name="name">fr2_btn_access_add_back</property>
+                                            <property name="width-request">28</property>
+                                            <property name="height-request">28</property>
+                                            <property name="visible">True</property>
+                                            <property name="can-focus">True</property>
+                                            <property name="receives-default">True</property>
+                                            <style>
+                                              <class name="universal_imgs"/>
+                                              <class name="fr2_playlist_back"/>
+                                            </style>
+                                          </object>
+                                          <packing>
+                                            <property name="x">20</property>
+                                            <property name="y">22</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <object class="GtkButton" id="fr2_btn_musics_sort12">
+                                            <property name="name">fr2_btn_musics_sort</property>
+                                            <property name="width-request">38</property>
+                                            <property name="height-request">38</property>
+                                            <property name="visible">True</property>
+                                            <property name="can-focus">True</property>
+                                            <property name="receives-default">True</property>
+                                            <style>
+                                              <class name="universal_imgs"/>
+                                              <class name="fr2_playlist_add"/>
+                                            </style>
+                                          </object>
+                                          <packing>
+                                            <property name="x">336</property>
+                                            <property name="y">83</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <object class="GtkLabel" id="fr2_music_actual_sort12">
+                                            <property name="name">fr2_music_actual_sort</property>
+                                            <property name="width-request">390</property>
+                                            <property name="height-request">60</property>
+                                            <property name="visible">True</property>
+                                            <property name="can-focus">False</property>
+                                            <property name="halign">start</property>
+                                            <property name="valign">start</property>
+                                            <property name="label" translatable="yes">God is woman</property>
+                                            <property name="wrap">True</property>
+                                            <style>
+                                              <class name="universal_font"/>
+                                              <class name="color_FFFFFF"/>
+                                              <class name="font_size_24"/>
+                                              <class name="universal_green_border"/>
+                                              <class name="border_0_radius"/>
+                                              <class name="fr2_btns_musics_list_border"/>
+                                            </style>
+                                          </object>
+                                          <packing>
+                                            <property name="y">67</property>
+                                          </packing>
+                                        </child>
+                                      </object>
+                                    </child>
+                                  </object>
+                                </child>
+                                <style>
+                                  <class name="universal_no_border"/>
+                                </style>
+                              </object>
+                            </child>
+                          </object>
+                          <packing>
+                            <property name="name">page_access_add</property>
+                            <property name="title" translatable="yes">page_access_add</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkFixed" id="fr2_access_view">
+                            <property name="name">fr2_access_view</property>
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <child>
+                              <object class="GtkLabel" id="fr2_display_music_border8">
+                                <property name="name">fr2_display_music_border2</property>
+                                <property name="width-request">392</property>
+                                <property name="height-request">71</property>
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <style>
+                                  <class name="universal_green_border"/>
+                                  <class name="fr2_btns_musics_list_border"/>
+                                  <class name="border_0_radius"/>
+                                </style>
+                              </object>
+                              <packing>
+                                <property name="y">246</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkLabel" id="fr2_display_music_border9">
+                                <property name="name">fr2_display_music_border2</property>
+                                <property name="width-request">392</property>
+                                <property name="height-request">61</property>
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <style>
+                                  <class name="universal_green_border"/>
+                                  <class name="border_0_radius"/>
+                                  <class name="fr2_btns_musics_list_border"/>
+                                </style>
+                              </object>
+                              <packing>
+                                <property name="y">317</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkLabel" id="fr2_access_label_view_name">
+                                <property name="name">fr2_access_label_view_name</property>
+                                <property name="width-request">392</property>
+                                <property name="height-request">68</property>
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <property name="halign">center</property>
+                                <property name="valign">center</property>
+                                <property name="label" translatable="yes">Breaking the habit </property>
+                                <style>
+                                  <class name="universal_font"/>
+                                  <class name="color_FFE0D4"/>
+                                  <class name="font_size_24"/>
+                                </style>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkLabel" id="fr2_access_label_view_artist">
+                                <property name="name">fr2_access_label_view_artist</property>
+                                <property name="width-request">392</property>
+                                <property name="height-request">52</property>
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <property name="halign">center</property>
+                                <property name="valign">center</property>
+                                <property name="label" translatable="yes">Billie Eilish</property>
+                                <style>
+                                  <class name="universal_font"/>
+                                  <class name="color_FFE0D4"/>
+                                  <class name="font_size_24"/>
+                                  <class name="universal_green_border"/>
+                                  <class name="border_0_radius"/>
+                                  <class name="fr2_btns_musics_list_border"/>
+                                </style>
+                              </object>
+                              <packing>
+                                <property name="y">68</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkLabel" id="fr2_access_label_text_album">
+                                <property name="name">fr2_access_label_text_album</property>
+                                <property name="width-request">392</property>
+                                <property name="height-request">44</property>
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <property name="halign">center</property>
+                                <property name="valign">center</property>
+                                <property name="label" translatable="yes">Álbum</property>
+                                <style>
+                                  <class name="universal_font"/>
+                                  <class name="color_FFFFFF"/>
+                                  <class name="font_size_24"/>
+                                  <class name="universal_green_border"/>
+                                  <class name="border_0_radius"/>
+                                  <class name="fr2_btns_musics_list_border"/>
+                                </style>
+                              </object>
+                              <packing>
+                                <property name="y">120</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkLabel" id="fr2_access_label_view_album">
+                                <property name="name">fr2_access_label_view_album</property>
+                                <property name="width-request">392</property>
+                                <property name="height-request">82</property>
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <property name="halign">center</property>
+                                <property name="valign">center</property>
+                                <property name="label" translatable="yes">When We All Fall Asleep, Where Do We Go?</property>
+                                <property name="justify">center</property>
+                                <property name="wrap">True</property>
+                                <style>
+                                  <class name="universal_font"/>
+                                  <class name="color_FFFDDB"/>
+                                  <class name="font_size_24"/>
+                                  <class name="universal_green_border"/>
+                                  <class name="border_0_radius"/>
+                                  <class name="fr2_btns_musics_list_border"/>
+                                </style>
+                              </object>
+                              <packing>
+                                <property name="y">164</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkLabel" id="fr2_access_label_text_duration">
+                                <property name="name">fr2_access_label_text_duration</property>
+                                <property name="width-request">60</property>
+                                <property name="height-request">32</property>
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <property name="halign">start</property>
+                                <property name="valign">start</property>
+                                <property name="label" translatable="yes">Duração: </property>
+                                <style>
+                                  <class name="universal_font"/>
+                                  <class name="color_FFFFFF"/>
+                                  <class name="font_size_24"/>
+                                </style>
+                              </object>
+                              <packing>
+                                <property name="x">14</property>
+                                <property name="y">251</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkLabel" id="fr2_access_label_view_minutes">
+                                <property name="name">fr2_access_label_view_minutes</property>
+                                <property name="width-request">78</property>
+                                <property name="height-request">32</property>
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <property name="halign">start</property>
+                                <property name="valign">start</property>
+                                <property name="label" translatable="yes">3:26 minutos</property>
+                                <property name="justify">center</property>
+                                <property name="single-line-mode">True</property>
+                                <style>
+                                  <class name="universal_font"/>
+                                  <class name="color_FFFDDB"/>
+                                  <class name="font_size_24"/>
+                                </style>
+                              </object>
+                              <packing>
+                                <property name="x">129</property>
+                                <property name="y">251</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkLabel" id="fr2_access_label_text_id">
+                                <property name="name">fr2_access_label_text_id</property>
+                                <property name="width-request">24</property>
+                                <property name="height-request">32</property>
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <property name="halign">start</property>
+                                <property name="valign">start</property>
+                                <property name="label" translatable="yes">ID:</property>
+                                <property name="justify">center</property>
+                                <property name="single-line-mode">True</property>
+                                <style>
+                                  <class name="universal_font"/>
+                                  <class name="color_FFFFFF"/>
+                                  <class name="font_size_24"/>
+                                </style>
+                              </object>
+                              <packing>
+                                <property name="x">14</property>
+                                <property name="y">283</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkLabel" id="fr2_access_label_view_id">
+                                <property name="name">fr2_access_label_view_id</property>
+                                <property name="width-request">34</property>
+                                <property name="height-request">32</property>
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <property name="halign">start</property>
+                                <property name="valign">start</property>
+                                <property name="label" translatable="yes">135257</property>
+                                <property name="justify">center</property>
+                                <property name="single-line-mode">True</property>
+                                <style>
+                                  <class name="universal_font"/>
+                                  <class name="color_FFFDDB"/>
+                                  <class name="font_size_24"/>
+                                </style>
+                              </object>
+                              <packing>
+                                <property name="x">56</property>
+                                <property name="y">283</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkButton" id="fr2_btn_access_list_back">
+                                <property name="label" translatable="yes">Voltar</property>
+                                <property name="name">fr2_btn_access_list_back</property>
+                                <property name="width-request">134</property>
+                                <property name="height-request">39</property>
+                                <property name="visible">True</property>
+                                <property name="can-focus">True</property>
+                                <property name="receives-default">True</property>
+                                <style>
+                                  <class name="universal_font"/>
+                                  <class name="font_size_20"/>
+                                  <class name="color_0A74FF"/>
+                                  <class name="fr2_btns_playlist_list_border"/>
+                                </style>
+                              </object>
+                              <packing>
+                                <property name="x">40</property>
+                                <property name="y">324</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkButton" id="fr2_btn_access_music_remove">
+                                <property name="label" translatable="yes">Remover</property>
+                                <property name="name">fr2_btn_access_music_remove</property>
+                                <property name="width-request">134</property>
+                                <property name="height-request">39</property>
+                                <property name="visible">True</property>
+                                <property name="can-focus">True</property>
+                                <property name="receives-default">True</property>
+                                <style>
+                                  <class name="universal_font"/>
+                                  <class name="font_size_20"/>
+                                  <class name="color_CB0000"/>
+                                  <class name="fr2_btns_playlist_list_border"/>
+                                </style>
+                              </object>
+                              <packing>
+                                <property name="x">216</property>
+                                <property name="y">324</property>
+                              </packing>
+                            </child>
+                          </object>
+                          <packing>
+                            <property name="name">page_access_view</property>
+                            <property name="title" translatable="yes">page_access_view</property>
+                            <property name="position">2</property>
+                          </packing>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="x">304</property>
+                        <property name="y">57</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel" id="fr2_access_sort">
+                        <property name="name">fr2_access_sort</property>
+                        <property name="width-request">46</property>
+                        <property name="height-request">24</property>
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="halign">start</property>
+                        <property name="valign">start</property>
+                        <property name="label" translatable="yes">Inserção</property>
+                        <property name="wrap">True</property>
+                        <style>
+                          <class name="universal_font"/>
+                          <class name="color_FFFFFF"/>
+                          <class name="font_size_32"/>
+                        </style>
+                      </object>
+                      <packing>
+                        <property name="x">356</property>
+                        <property name="y">8</property>
+                      </packing>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="name">page_access</property>
+                    <property name="title" translatable="yes">page_access</property>
+                    <property name="position">1</property>
                   </packing>
                 </child>
                 <child>
@@ -734,7 +1473,7 @@
                   <packing>
                     <property name="name">page_music</property>
                     <property name="title" translatable="yes">page_music</property>
-                    <property name="position">1</property>
+                    <property name="position">2</property>
                   </packing>
                 </child>
               </object>
