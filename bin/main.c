@@ -34,16 +34,12 @@ void switchPage(GtkButton *btn, gpointer user_data);
 void setting_musics_list(gpointer data);
 void setting_playlist_list(gpointer data);
 void setting_playlist_music_list(gpointer data);
+void setting_musics_list_add(gpointer data);
 
 // -----------------------------------------------------------------
 
-// Animações
-void button_set_click_animation(GtkWidget *button); 
-gboolean button_click_animation(gpointer data);
-
-// --------------------------------------------------------------
-
 // Edição
+void add_actual_music_in_playlist(GtkButton *btn, gpointer user_data);
 void change_label_text(GtkLabel *label, gchar *text);
 void set_actual_music_in_playlist(GtkButton *btn, gpointer user_data);
 void set_button_text_with_limit(GtkWidget *button, const char *text);
@@ -55,6 +51,13 @@ void clear_buttons_from_fixed(GtkFixed *fixed);
 // Animations 
 void logStartAnimation(gchar *text, gchar *color, gint duration, gint height, gint width, gint x, gint y, gint yDirection, GtkFixed *fixed);
 gboolean logAnimation(gpointer data);
+
+void button_set_hide_animation(GtkWidget *button, gint timer);
+gboolean button_hide_animation(gpointer data);
+
+void button_set_click_animation(GtkWidget *button); 
+gboolean button_click_animation(gpointer data);
+
 // =======================================================================================================
 
 // -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*--*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -170,21 +173,7 @@ void switchPage(GtkButton *btn, gpointer user_data) {
     GtkImage *fr2_index_image = GTK_IMAGE(gtk_builder_get_object(builder, "fr2_index_image"));
     GtkEntry *fr2_entry_playlist_name = GTK_ENTRY(gtk_builder_get_object(builder, "fr2_entry_playlist_name"));
 
-    // Obtém o nome do botão clicado
     const gchar *button_name = gtk_widget_get_name(GTK_WIDGET(btn));
-
-    /*// Frame 2 Elementos para limpar
-    GtkLabel *fr2_label_elements[] = {NULL};
-    GtkEntry *fr2_input_elements[] = {fr2_inp_user, fr2_inp_pass, NULL};
-
-    // Frame 3 Elementos para limpar
-    GtkLabel *fr3_label_elements[] = {NULL};
-    GtkEntry *fr3_input_elements[] = {NULL};
-
-    // Frame 5 Elementos para analisar e limpar
-    GtkEntry *fr5_cave_inp_name = GTK_ENTRY(gtk_builder_get_object(builder, "fr5_cave_inp_name"));
-    GtkLabel *fr5_cave_dragon_name_error = GTK_LABEL(gtk_builder_get_object(builder, "fr5_cave_dragon_name_error"));
-    */
 
     // Altera a página visível da GtkStack com base no nome do botão
     // Frame 1
@@ -318,6 +307,7 @@ void switchPage(GtkButton *btn, gpointer user_data) {
      if (g_strcmp0(button_name, "fr2_btn_add_music") == 0) {
         button_set_click_animation(GTK_WIDGET(btn));
         gtk_stack_set_visible_child_name(fr2_stack_access, "page_access_add");
+        setting_musics_list_add(NULL);
     }
 
     if (g_strcmp0(button_name, "fr2_btn_access_add_back") == 0) {
@@ -415,7 +405,6 @@ void registerSignals(GtkBuilder *builder) {
 
     GObject * fr2_btn_access_list_back = gtk_builder_get_object(builder, "fr2_btn_access_list_back");
     g_signal_connect(fr2_btn_access_list_back, "clicked", G_CALLBACK(switchPage), NULL);
-
 }
 
 /**********************************************************************************************
@@ -479,6 +468,56 @@ void setting_musics_list(gpointer data) {
             set_button_text_with_limit(fr2_musics_btns_vector[i], pMusicsDatabaseVector[i].nome);
         }
     }
+}
+
+void setting_musics_list_add(gpointer data) {
+    gint setting = GPOINTER_TO_INT(data);
+    gint length = musicsLength(pMusicsDatabase);
+    GtkFixed * fixed = GTK_FIXED(gtk_builder_get_object(builder, "fr2_access_add_fixed"));
+    gint actualLength = length;
+
+    if(length < 4)
+        length = 4;
+    
+    musica * allMusicsVector = readMusicsvector(pMusicsDatabase);
+
+    gtk_widget_set_sensitive(GTK_WIDGET(fixed), FALSE);
+    clear_buttons_from_fixed(fixed);
+
+    for(int i=0; i < length; i++) {
+        GtkWidget *label = gtk_label_new("");
+        GtkStyleContext *label_context = gtk_widget_get_style_context(label);
+
+        gtk_fixed_put(GTK_FIXED(fixed), label, 0, 67+i*61);
+        gtk_widget_set_size_request(label, 390, 61);  
+
+        gtk_style_context_add_class(label_context, "universal_green_border");
+        gtk_style_context_add_class(label_context, "universal_font");
+        gtk_style_context_add_class(label_context, "color_FFFFFF");
+        gtk_style_context_add_class(label_context, "font_size_20");
+        gtk_style_context_add_class(label_context, "border_0_radius");
+        gtk_style_context_add_class(label_context, "fr2_btns_musics_list_border");
+        g_object_set_data(G_OBJECT(label), "is_button", "true");
+        
+        if(i < actualLength) {
+            GtkWidget *button = gtk_button_new_with_label("");
+            gtk_fixed_put(GTK_FIXED(fixed), button, 336, 83+i*61);
+            gtk_widget_set_size_request(button, 38, 38);
+            set_button_text_with_limit(label, allMusicsVector[i].nome);
+            button_set_hide_animation(button, 200);
+            GtkStyleContext *btn_context = gtk_widget_get_style_context(button);
+            gtk_style_context_add_class(btn_context, "universal_imgs");
+            gtk_style_context_add_class(btn_context, "fr2_playlist_add");
+            g_object_set_data(G_OBJECT(button), "is_button", "true");
+            g_signal_connect(button, "clicked", G_CALLBACK(add_actual_music_in_playlist), GINT_TO_POINTER(i));
+        }
+        else
+            set_button_text_with_limit(label, "---");
+        
+    }
+    gtk_widget_show_all(GTK_WIDGET(fixed));
+    gtk_widget_set_sensitive(GTK_WIDGET(fixed), TRUE);
+    g_free(allMusicsVector);
 }
 
 void setting_playlist_list(gpointer data) {
@@ -597,7 +636,7 @@ void setting_playlist_music_list(gpointer data) {
             gtk_fixed_put(GTK_FIXED(fixed), button, 344, 136+i*61);
             gtk_widget_set_size_request(button, 29, 29);
             set_button_text_with_limit(label, playlistMusicsVector[i].nome);
-
+            button_set_hide_animation(button, 200);
             GtkStyleContext *btn_context = gtk_widget_get_style_context(button);
             gtk_style_context_add_class(btn_context, "universal_imgs");
             gtk_style_context_add_class(btn_context, "fr2_btn_buttons");
@@ -612,6 +651,7 @@ void setting_playlist_music_list(gpointer data) {
     gtk_widget_set_sensitive(GTK_WIDGET(fixed), TRUE);
     g_free(playlistMusicsVector);
 }
+
 /*
 ================================================================================================
 Animations */
@@ -627,8 +667,49 @@ gboolean button_click_animation(gpointer data) {
     return FALSE;
 }
 
+void button_set_hide_animation(GtkWidget *button, gint timer) {
+    gtk_widget_set_opacity(button, 0.0);
+    g_timeout_add(timer, button_click_animation, button);
+}
+
+gboolean button_hide_animation(gpointer data) {
+    GtkWidget *button = GTK_WIDGET(data);
+    gtk_widget_set_opacity(button, 1.0);
+    return FALSE;
+}
+
+
 /***********************************************************************************************/
 /* Editions */
+void add_actual_music_in_playlist(GtkButton *btn, gpointer user_data) {
+    gint index = GPOINTER_TO_INT(user_data);
+    gchar message[300], color[100];
+    GtkFixed *fixed = GTK_FIXED(gtk_builder_get_object(builder, "fr2_main"));
+    GtkStack *fr2_stack_access = GTK_STACK(gtk_builder_get_object(builder, "fr2_stack_access"));
+    gint length = musicsLength(pMusicsDatabase);
+    musica *vector = readMusicsvector(pMusicsDatabase);
+    g_snprintf(color, sizeof(color), "CB0000");
+    button_set_click_animation(GTK_WIDGET(btn));
+    musica addMusic = vector[index];
+    gint status = addNewMusicInPlaylist(addMusic, pActualPlaylistOpened);
+    g_print("status: %d\n", status);
+
+    if(status == 0) {
+        g_snprintf(message, sizeof(message), "Ocorreu um erro ao inserir a música.");
+    }
+    if(status == 1) {
+        g_snprintf(message, sizeof(message), "Música %s adicionada com sucesso!", vector[index].nome);
+        g_snprintf(color, sizeof(color), "1FD660");
+        setting_playlist_music_list(GINT_TO_POINTER(0));
+        gtk_stack_set_visible_child_name(fr2_stack_access, "page_access_list");
+    }
+    if(status == -2)
+        g_snprintf(message, sizeof(message), "A música já está presente na playlist.");
+    
+    logStartAnimation(message, color, 1500, 21, 665, 163, 158, 20, fixed);
+    g_free(vector);
+}
+
 void set_actual_music_in_playlist(GtkButton *btn, gpointer user_data) {
     gint index = GPOINTER_TO_INT(user_data);
     gchar sprintText[200];
