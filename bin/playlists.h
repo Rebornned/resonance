@@ -30,6 +30,7 @@ typedef struct {
     char name[100];
 } PlaylistData;
 
+
 void ini_lista (playlist* nova);
 
 int segundos (int v[][2]);
@@ -75,6 +76,8 @@ PlaylistData * readerPlaylistsController (FILE *pFile);
 int lengthPlaylistsController(FILE *pFile);
 int removePlaylistsController(char *name, FILE *controller, FILE *removeFile);
 int printMusicsInPlaylist(FILE *pFile);
+
+
 //=================================================================================================
 // Sort
 

@@ -6,6 +6,8 @@
 #include <unistd.h>
 #include <locale.h>
 #include <ctype.h>
+#include <gtk/gtk.h>
+#include <glib.h>
 
 /* A ordem das músicas armazenadas nas playlists importa e deve ser modificável, organizável das
  seguinte formas: em ordem de inclusão na playlist, em ordem alfabética de nome, em ordem
@@ -39,6 +41,7 @@ void bubbleTypeSort(musica *vector, int type, int size);
 int sortCompName(const void *a, const void *b);
 int sortCompArtist(const void *a, const void *b);
 int sortCompAlbum(const void *a, const void *b);
+
 //================================================================================================
 // Searchs
 int sequencialSearch(int num, int vector[], int length);
@@ -51,29 +54,6 @@ char * adornString(const char *string);
 // ===============================================================================================
 /*
 int main() {
-    FILE *musicDatabase = fopen("../files/musics_database.bin", "rb+");
-    FILE * controller = openPlaylistsController();
-    //printf("Criacao playlist: %d\n", createNewPlaylistFile("Treino 2024", controller));
-    //printf("Criacao playlist: %d\n", createNewPlaylistFile("Treino 2025", controller));
-
-    FILE *newPlaylistFile = acessPlaylistFile("Tudo dorme");
-
-    musica * musicsVector = readMusicsvector(musicDatabase);
-
-    printf("add: %d\n", addNewMusicInPlaylist(musicsVector[2], newPlaylistFile));
-    printf("add: %d\n", addNewMusicInPlaylist(musicsVector[4], newPlaylistFile));
-    printf("add: %d\n", addNewMusicInPlaylist(musicsVector[0], newPlaylistFile));
-    printf("add: %d\n", addNewMusicInPlaylist(musicsVector[1], newPlaylistFile));
-    printf("add: %d\n", addNewMusicInPlaylist(musicsVector[5], newPlaylistFile));
-    printf("add: %d\n", addNewMusicInPlaylist(musicsVector[7], newPlaylistFile));
-    //printf("add: %d\n", addNewMusicInPlaylist(musicsVector[1], newPlaylistFile));
-    printMusicsInPlaylist(newPlaylistFile);    
-    fclose(newPlaylistFile);
-    //printf("remove: %d\n", delNewMusicInPlaylist(musicsVector[0], newPlaylistFile));
-    //printf("result: %d\n", removePlaylistsController("Treino 2024", controller, newPlaylistFile));
-
-    //printMusicsInPlaylist(newPlaylistFile);    
-
     /*
     reinsFile(resetDatabase);
     for(int i=0; i < 11; i++) {
@@ -694,6 +674,7 @@ Sorts
 void bubbleTypeSort(musica *vector, int type, int size) { // Um bubble sort capaz de sortear por diferentes condições
     int ordened = 0, sortByValue1, sortByValue2;
     musica aux, comp1, comp2;
+    int value = size;
     if(size < 1)
         return;
 

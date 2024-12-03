@@ -25,6 +25,11 @@ typedef struct {
     gint interactions;
 } GtkUpAnimationData;
 
+typedef struct {
+    musica *vector;
+    gint index;
+}  GtkVectorData;
+
 // +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=++=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=++=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 // Funções referentes a tela
 
@@ -57,6 +62,9 @@ gboolean button_hide_animation(gpointer data);
 
 void button_set_click_animation(GtkWidget *button); 
 gboolean button_click_animation(gpointer data);
+
+void turn_off_button_start(GtkWidget *widget);
+gboolean turn_off_button(gpointer data);
 
 // =======================================================================================================
 
@@ -183,7 +191,13 @@ void switchPage(GtkButton *btn, gpointer user_data) {
     }
 
     if (g_strcmp0(button_name, "fr1_btn_playlist") == 0) {
+        gtk_stack_set_transition_duration(fr2_stack, 0);
+        gtk_stack_set_visible_child_name(fr2_stack, "page_playlist");
+        gtk_stack_set_transition_duration(fr2_stack, 200);
         gtk_stack_set_visible_child_name(main_stack, "page_main");
+        gtk_image_set_from_file(fr2_index_image, "../assets/ui_images/selector_page_2.png");
+        change_label_text(fr2_label_page, "Playlists");
+        fr2_main_stack_index++;
     }
     
     // ***************************************************************************************************
@@ -331,7 +345,6 @@ void switchPage(GtkButton *btn, gpointer user_data) {
         g_snprintf(color, sizeof(color), "CB0000");
         button_set_click_animation(GTK_WIDGET(btn));
         gint status = delNewMusicInPlaylist(delMusic, pActualPlaylistOpened);
-        g_print("status: %d\n", status);
 
         if(status == 1) {
             g_snprintf(message, sizeof(message), "Música apagada com sucesso!");
@@ -359,6 +372,9 @@ void registerSignals(GtkBuilder *builder) {
     // Frame 1 Botões
     GObject *fr1_btn_music = gtk_builder_get_object(builder, "fr1_btn_music");
     g_signal_connect(fr1_btn_music, "clicked", G_CALLBACK(switchPage), main_stack);
+
+    GObject *fr1_btn_playlist = gtk_builder_get_object(builder, "fr1_btn_playlist");
+    g_signal_connect(fr1_btn_playlist, "clicked", G_CALLBACK(switchPage), main_stack);
 
     // Frame 2 Botões
     GObject * fr2_btn_musics_sort = gtk_builder_get_object(builder, "fr2_btn_musics_sort");
@@ -415,6 +431,7 @@ void setting_musics_list(gpointer data) {
 
     GtkWidget *btn = GTK_WIDGET(gtk_builder_get_object(builder, "fr2_btn_musics_sort"));
     button_set_click_animation(btn);
+    turn_off_button_start(GTK_WIDGET(btn));
 
     GtkLabel * fr2_music_actual_sort = GTK_LABEL(gtk_builder_get_object(builder, "fr2_music_actual_sort"));
     gint typeSort = 1;
@@ -572,6 +589,8 @@ void setting_playlist_music_list(gpointer data) {
     GtkFixed * fixed = GTK_FIXED(gtk_builder_get_object(builder, "fr2_access_list_fixed"));
     gint actualLength = length;
     gint typeSort = 0;
+    GtkWidget *secondSort = GTK_WIDGET(gtk_builder_get_object(builder, "fr2_btn_playlist_music_sort"));
+    turn_off_button_start(secondSort);
 
     if(length < 4)
         length = 4;
@@ -641,7 +660,8 @@ void setting_playlist_music_list(gpointer data) {
             gtk_style_context_add_class(btn_context, "universal_imgs");
             gtk_style_context_add_class(btn_context, "fr2_btn_buttons");
             g_object_set_data(G_OBJECT(button), "is_button", "true");
-            g_signal_connect(button, "clicked", G_CALLBACK(set_actual_music_in_playlist), GINT_TO_POINTER(i));
+
+            g_signal_connect(button, "clicked", G_CALLBACK(set_actual_music_in_playlist), GINT_TO_POINTER(playlistMusicsVector[i].id));
         }
         else
             set_button_text_with_limit(label, "---");
@@ -649,7 +669,7 @@ void setting_playlist_music_list(gpointer data) {
     }
     gtk_widget_show_all(GTK_WIDGET(fixed));
     gtk_widget_set_sensitive(GTK_WIDGET(fixed), TRUE);
-    g_free(playlistMusicsVector);
+    //g_free(playlistMusicsVector);
 }
 
 /*
@@ -657,8 +677,10 @@ void setting_playlist_music_list(gpointer data) {
 Animations */
 
 void button_set_click_animation(GtkWidget *button) {
-    gtk_widget_set_opacity(button, 0.7);
-    g_timeout_add(100, button_click_animation, button);
+    if(button != NULL) {
+        gtk_widget_set_opacity(button, 0.7);
+        g_timeout_add(100, button_click_animation, button);
+    }
 }
 
 gboolean button_click_animation(gpointer data) {
@@ -668,8 +690,10 @@ gboolean button_click_animation(gpointer data) {
 }
 
 void button_set_hide_animation(GtkWidget *button, gint timer) {
-    gtk_widget_set_opacity(button, 0.0);
-    g_timeout_add(timer, button_click_animation, button);
+    if(button != NULL) {
+        gtk_widget_set_opacity(button, 0.0);
+        g_timeout_add(timer, button_click_animation, button);
+    }
 }
 
 gboolean button_hide_animation(gpointer data) {
@@ -678,7 +702,18 @@ gboolean button_hide_animation(gpointer data) {
     return FALSE;
 }
 
+void turn_off_button_start(GtkWidget *widget) {
+    if(widget != NULL) {
+        gtk_widget_set_sensitive(widget, FALSE);
+        g_timeout_add(500, turn_off_button, widget);
+    }
+}
 
+gboolean turn_off_button(gpointer data) {
+    GtkWidget *widget = (GtkWidget *) data;
+    gtk_widget_set_sensitive(widget, TRUE);
+    return FALSE;
+}
 /***********************************************************************************************/
 /* Editions */
 void add_actual_music_in_playlist(GtkButton *btn, gpointer user_data) {
@@ -692,7 +727,6 @@ void add_actual_music_in_playlist(GtkButton *btn, gpointer user_data) {
     button_set_click_animation(GTK_WIDGET(btn));
     musica addMusic = vector[index];
     gint status = addNewMusicInPlaylist(addMusic, pActualPlaylistOpened);
-    g_print("status: %d\n", status);
 
     if(status == 0) {
         g_snprintf(message, sizeof(message), "Ocorreu um erro ao inserir a música.");
@@ -711,9 +745,10 @@ void add_actual_music_in_playlist(GtkButton *btn, gpointer user_data) {
 }
 
 void set_actual_music_in_playlist(GtkButton *btn, gpointer user_data) {
-    gint index = GPOINTER_TO_INT(user_data);
+    gint id = GPOINTER_TO_INT(user_data), index;
     gchar sprintText[200];
     gint minutes, seconds;
+    musica *vector = readMusicsvector(pActualPlaylistOpened);
 
     GtkStack *fr2_stack_access = GTK_STACK(gtk_builder_get_object(builder, "fr2_stack_access"));
     GtkLabel *fr2_access_label_view_name = GTK_LABEL(gtk_builder_get_object(builder, "fr2_access_label_view_name"));
@@ -722,12 +757,16 @@ void set_actual_music_in_playlist(GtkButton *btn, gpointer user_data) {
     GtkLabel *fr2_access_label_view_minutes = GTK_LABEL(gtk_builder_get_object(builder, "fr2_access_label_view_minutes"));
     GtkLabel *fr2_access_label_view_id = GTK_LABEL(gtk_builder_get_object(builder, "fr2_access_label_view_id"));
     
+
     if(btn != NULL)
         button_set_click_animation(GTK_WIDGET(btn));
 
     gtk_stack_set_visible_child_name(fr2_stack_access, "page_access_view");
     
-    musica *vector = readMusicsvector(pActualPlaylistOpened);
+    for(int i=0; i < musicsLength(pActualPlaylistOpened); i++)
+        if(vector[i].id == id)
+            index = i;
+
     minutes = vector[index].tempo / 60;
     seconds = vector[index].tempo - minutes*60;
     sprintf(sprintText, "%d:%d minutos", minutes, seconds);
@@ -742,8 +781,6 @@ void set_actual_music_in_playlist(GtkButton *btn, gpointer user_data) {
     
     sprintf(sprintText, "%d", vector[index].id);
     change_label_text(fr2_access_label_view_id, sprintText);
-
-    g_free(vector);
 }
 
 void set_actual_music_in_list(GtkButton *btn, gpointer user_data) {
@@ -869,7 +906,8 @@ gboolean logAnimation(gpointer data) {
         animData->y -= 1;
         animData->opacity -= animData->opacityDecrease;
         gtk_fixed_move(animData->container, GTK_WIDGET(animData->widget), animData->x, animData->y);
-        gtk_widget_set_opacity(animData->widget, animData->opacity);
+        if(animData->widget != NULL)
+            gtk_widget_set_opacity(animData->widget, animData->opacity);
         animData->interactions -= 1;
         return TRUE;
     }
