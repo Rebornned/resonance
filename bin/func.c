@@ -6,8 +6,6 @@
 #include <unistd.h>
 #include <locale.h>
 #include <ctype.h>
-#include <gtk/gtk.h>
-#include <glib.h>
 
 /* A ordem das músicas armazenadas nas playlists importa e deve ser modificável, organizável das
  seguinte formas: em ordem de inclusão na playlist, em ordem alfabética de nome, em ordem
@@ -54,16 +52,16 @@ char * adornString(const char *string);
 // ===============================================================================================
 /*
 int main() {
-    /*
+    FILE *resetDatabase = fopen("../files/musics_database.bin", "rb+");
     reinsFile(resetDatabase);
-    for(int i=0; i < 11; i++) {
+    for(int i=0; i < 98; i++) {
         gravador(i);
     }
     printf("\n");
     
     return 0;
-}*/
-
+}
+*/
 void ini_lista (playlist* nova) {
 
     nova->inicio = NULL;
@@ -270,17 +268,6 @@ void apagar_musica_bin (void) { // excluir música do arquivo binario
         } if (!encontrou) printf("Musica com ID %d noo encontrada para exclusao.\n", musicas_selecionadas[i].id);
 
     }
-
-    /* while (fread(&excluir, sizeof(musica), 1, gravados)) {
-
-        if (excluir.id == id_remove) {
-
-            encontrou = 1;
-            printf("Musica com ID %d excluida.\n", id_remove);
-
-        } else fwrite(&excluir, sizeof(musica), 1, aux);
-
-    } if (!encontrou) printf("ID %d não encontrado. Tente novamente.\n", escolha); */
 
     fclose(gravados);
     fclose(aux);

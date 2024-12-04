@@ -66,6 +66,7 @@ gboolean button_click_animation(gpointer data);
 void turn_off_button_start(GtkWidget *widget);
 gboolean turn_off_button(gpointer data);
 
+static void set_cursor_window(GtkWidget *widget, gpointer data);
 // =======================================================================================================
 
 // -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*--*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -150,15 +151,13 @@ int main (int argc, char *argv[]) {
 
     fr2_playlists_btns_vector = malloc(sizeof(GtkWidget *) * allocatedSizePlaylists);
     setting_playlist_list(GINT_TO_POINTER(0));
-    // Funções da tela
-    //GtkLabel *label1 = GTK_LABEL(gtk_builder_get_object(builder, "label1"));
-    //change_label_text(label1, "teste");
-    
+   
     // ************************************************************************************************
 
     // Registrando sinais de callback para botões executarem funções
     registerSignals(builder);
     //g_signal_connect(window, "map", G_CALLBACK(set_cursor_window), NULL);
+    g_signal_connect(window, "map", G_CALLBACK(set_cursor_window), NULL);
 
     gtk_widget_show_all(window);
 
@@ -591,6 +590,7 @@ void setting_playlist_music_list(gpointer data) {
     gint typeSort = 0;
     GtkWidget *secondSort = GTK_WIDGET(gtk_builder_get_object(builder, "fr2_btn_playlist_music_sort"));
     turn_off_button_start(secondSort);
+    button_set_click_animation(secondSort);
 
     if(length < 4)
         length = 4;
@@ -916,4 +916,12 @@ gboolean logAnimation(gpointer data) {
     g_free(animData);
     return FALSE;
 }
+
+static void set_cursor_window(GtkWidget *widget, gpointer data) {
+    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file("../assets/ui_images/cursor.png", NULL);
+    GdkCursor *cursor = gdk_cursor_new_from_pixbuf(gdk_display_get_default(), pixbuf, 0, 0);
+
+    gdk_window_set_cursor(gtk_widget_get_window(window), cursor);
+}
+
 /*=============================================================================================*/

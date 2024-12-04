@@ -1000,7 +1000,7 @@
                             <property name="can-focus">False</property>
                             <child>
                               <object class="GtkScrolledWindow">
-                                <property name="width-request">392</property>
+                                <property name="width-request">410</property>
                                 <property name="height-request">374</property>
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
