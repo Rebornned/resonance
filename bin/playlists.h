@@ -50,14 +50,6 @@ void add_playlist (playlist *nova);
 
 void apagar_playlist (playlist *pl);
 
-void ord_nome ();
-
-void ord_artista ();
-
-void ord_tempo ();
-
-#endif //FINAL_PROJECT_PROG2_PLAYLISTS_PLAYLISTS_H
-
 // ===========================================================================================
 // Funções de tratamento de arquivo
 
@@ -76,7 +68,6 @@ PlaylistData * readerPlaylistsController (FILE *pFile);
 int lengthPlaylistsController(FILE *pFile);
 int removePlaylistsController(char *name, FILE *controller, FILE *removeFile);
 int printMusicsInPlaylist(FILE *pFile);
-
 
 //=================================================================================================
 // Sort
