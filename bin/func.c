@@ -528,7 +528,7 @@ int createNewPlaylistFile(char *name, FILE *controller) { // Cria um novo arquiv
     return result;
 }
 
-FILE * acessPlaylistFile(char *name) {
+FILE * acessPlaylistFile(char *name) { // Retorna um ponteiro de acesso ao arquivo da playlist especifica
     char fileName[300], nameFormat[100];
     validateString(name, nameFormat);
     snprintf(fileName, sizeof(fileName), "../files/playlists/playlist_%s.bin", nameFormat);
@@ -641,14 +641,14 @@ void reinsFile(FILE *pFile) { // Reseta o arquivo binário
 
 /* =========================================================================================================
 Searchs */
-int sequencialSearch(int num, int vector[], int length) {
+int sequencialSearch(int num, int vector[], int length) { // Busca sequencial de um número em um vetor
     for(int i=0; i < length; i++) 
         if(num == vector[i])
             return 1;
     return 0;
 }
 
-int isMusicInVector(musica music, musica *vector, int length) {
+int isMusicInVector(musica music, musica *vector, int length) { // Verifica se uma música especifica está no vetor de músicas
     for(int i=0; i < length; i++) {
         if(music.id == vector[i].id)
             return i;
@@ -730,7 +730,7 @@ int sortCompAlbum(const void *a, const void *b) { // auxiliar de qsort para camp
 /*========================================================================================================
 Strings
 */
-void validateString(const char *string, char *validate) {
+void validateString(const char *string, char *validate) { // Verifica se a string recebida contém caracteres especiais e também substitui espaços por underline
     static char result[256]; 
 
     strcpy(result, string);
@@ -747,7 +747,7 @@ void validateString(const char *string, char *validate) {
     strcpy(validate, result);
 }
 
-char * adornString(const char *string) {
+char * adornString(const char *string) { // Recebe uma string espaçadas com underline e retorna ela com espaços
     static char adornStr[256];
     strcpy(adornStr, string);
 
