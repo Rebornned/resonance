@@ -13,7 +13,8 @@ cmake-build-*/
 *~
 *.swp
 
-# Windows installer output
+# Windows installer: collected runtime and output
+build/
 installer/output/
 
 # OS files

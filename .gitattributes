@@ -1,2 +1,5 @@
 *.bin binary
 *.dat binary
+
+# Shell scripts must keep LF line endings, also when checked out on Windows
+*.sh text eol=lf
