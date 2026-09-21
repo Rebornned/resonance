@@ -89,6 +89,9 @@ resonance/
 │   ├── library.c
 │   └── library.h
 ├── tools/build_database.c
+├── installer/
+│   ├── collect-runtime.sh   # junta o executável e as DLLs do GTK
+│   └── resonance.iss        # script do Inno Setup
 ├── Makefile
 ├── CREDITS.md
 └── LICENSE
@@ -96,9 +99,9 @@ resonance/
 
 ## Como executar
 
-### Windows
+### Windows (instalador)
 
-Baixe o instalador na seção [Releases](../../releases). Ele instala o programa, as bibliotecas do GTK e a fonte, sem exigir permissão de administrador.
+Baixe o `Resonance_setup.exe` (11 MB) na seção [Releases](../../releases). Ele instala o programa, as bibliotecas do GTK e a fonte, sem exigir permissão de administrador, e remove tudo, inclusive a fonte, ao desinstalar.
 
 ### Linux (compilando)
 
@@ -125,6 +128,25 @@ make clean
 
 O programa usa caminhos relativos a `bin/` (`../assets`, `../files`); `make run` já executa a partir dessa pasta.
 
+### Windows (compilando)
+
+No terminal **MINGW64** do [MSYS2](https://www.msys2.org):
+
+```bash
+pacman -S --needed make mingw-w64-x86_64-gcc mingw-w64-x86_64-pkgconf mingw-w64-x86_64-gtk3
+make run
+```
+
+A fonte `assets/fonts/JotiOne-Regular.ttf` precisa estar instalada no Windows (clique duplo no arquivo → Instalar).
+
+### Gerando o instalador
+
+```bash
+bash installer/collect-runtime.sh   # no terminal MINGW64: compila e monta build/windows/
+```
+
+Depois, abra `installer/resonance.iss` no [Inno Setup 6](https://jrsoftware.org/isinfo.php) e compile (Ctrl+F9). O script copia só as DLLs do MSYS2 de que o executável depende — nenhuma DLL do próprio Windows é distribuída.
+
 ## Limitações conhecidas
 
 - Precisa ser executado a partir de `bin/`. Fora dela, encerra com uma mensagem de erro.
@@ -143,6 +165,7 @@ Principais mudanças em relação à versão entregue em 2024:
 - Suporte a nomes de playlist com acento e arquivos de playlist nomeados por ID.
 - Remoção do código não utilizado, identificadores e comentários em inglês, código em `src/`, `Makefile` e ferramenta de geração da base.
 - Remoção de 185 MB de binários (DLLs e executáveis) do histórico do Git.
+- Instalador refeito: 11 MB (o de 2024 tinha 30 MB), sem exigir administrador e sem distribuir DLLs do Windows.
 
 ## Tecnologias
 

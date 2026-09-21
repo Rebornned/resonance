@@ -29,7 +29,7 @@ if [[ ! -f Makefile || ! -d src ]]; then
 fi
 
 echo "==> Building"
-mingw32-make
+make
 
 rm -rf "$OUT"
 mkdir -p "$OUT/bin" "$OUT/$PIXBUF_DIR/loaders" "$OUT/share/glib-2.0/schemas" "$OUT/share/icons"
