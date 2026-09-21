@@ -106,6 +106,13 @@ int main (int argc, char *argv[]) {
     // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
     gtk_init(&argc, &argv);
 
+    // Checked before loading the interface: all paths are relative to bin/
+    songs_file = fopen("../files/musics_database.bin", "rb+");
+    if(songs_file == NULL) {
+        g_printerr("Could not open ../files/musics_database.bin (run the program from the bin/ folder).\n");
+        return 1;
+    }
+
     GtkCssProvider *css_provider;
     // Load the interface described in the .glade file
     builder = gtk_builder_new_from_file("../assets/ui_files/playlists.glade");
@@ -134,11 +141,6 @@ int main (int argc, char *argv[]) {
     // ================================================================================================
     // Frame 2 - Songs
     fr2_main_stack_index = 0;
-    songs_file = fopen("../files/musics_database.bin", "rb+");
-    if(songs_file == NULL) {
-        g_printerr("Could not open ../files/musics_database.bin (run the program from the bin/ folder).\n");
-        return 1;
-    }
     all_songs = read_songs(songs_file);
 
     // Buttons created at run time for each list item
