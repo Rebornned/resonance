@@ -1,0 +1,23 @@
+# Build output
+bin/resonance
+bin/resonance.exe
+*.o
+*.exe
+
+# User data created at runtime
+files/playlists/*.bin
+
+# Editors and IDEs
+.idea/
+.vscode/
+cmake-build-*/
+*~
+*.swp
+
+# Windows installer output
+installer/output/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
