@@ -3,7 +3,7 @@
 #include <string.h>
 #include <gtk/gtk.h>
 #include <glib.h>
-#include "playlists.h"
+#include "library.h"
 
 // Text shown in the sort labels, indexed by SortMode
 static const gchar *SORT_LABELS[] = {

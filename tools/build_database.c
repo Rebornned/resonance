@@ -15,7 +15,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../src/playlists.h"
+#include "../src/library.h"
 
 #define LINE_SIZE 512
 

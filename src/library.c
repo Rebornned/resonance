@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "playlists.h"
+#include "library.h"
 #include <unistd.h>
 #include <glib.h>
 

@@ -17,8 +17,8 @@ endif
 TARGET  := bin/resonance$(EXE)
 TOOL    := bin/build_database$(EXE)
 
-SRC := src/main.c src/func.c
-HDR := src/playlists.h
+SRC := src/main.c src/library.c
+HDR := src/library.h
 
 DATA_SRC := data/musics.txt
 DATABASE := files/musics_database.bin
