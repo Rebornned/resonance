@@ -82,3 +82,5 @@ int sequencialSearch(int num, int vector[], int length);
 int isMusicInVector(musica music, musica *vector, int length);
 
 //================================================================================================
+
+#endif // FINAL_PROJECT_PROG2_PLAYLISTS_PLAYLISTS_H

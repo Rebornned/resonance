@@ -514,7 +514,7 @@ int playlistFileExists(char *name) { // Verifica se a arquivo da playlist existe
 
 int createNewPlaylistFile(char *name, FILE *controller) { // Cria um novo arquivo de playlist, ou acessa caso ele já exista
     char fileName[300], nameFormat[100];
-    FILE *pFile;
+    FILE *pFile = NULL;
     int result = addPlaylistsController(name, controller);
     validateString(name, nameFormat);
 
@@ -524,7 +524,8 @@ int createNewPlaylistFile(char *name, FILE *controller) { // Cria um novo arquiv
     }
     if(result == -1)
         pFile = fopen(fileName, "ab+");
-    fclose(pFile);
+    if(pFile != NULL)
+        fclose(pFile);
     return result;
 }
 

@@ -8,7 +8,7 @@
     <property name="title" translatable="yes">Playlists</property>
     <property name="default-width">1000</property>
     <property name="default-height">600</property>
-    <property name="icon">../ui_images\playlists_ico.png</property>
+    <property name="icon">../ui_images/playlists_ico.png</property>
     <child>
       <object class="GtkStack" id="main_stack">
         <property name="name">main_stack</property>
@@ -109,7 +109,7 @@
                 <property name="height-request">317</property>
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="pixbuf">../ui_images\frame_1_background.png</property>
+                <property name="pixbuf">../ui_images/frame_1_background.png</property>
               </object>
               <packing>
                 <property name="y">231</property>
@@ -155,7 +155,7 @@
                 <property name="height-request">30</property>
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="pixbuf">../ui_images\selector_page_1.png</property>
+                <property name="pixbuf">../ui_images/selector_page_1.png</property>
               </object>
               <packing>
                 <property name="x">472</property>
