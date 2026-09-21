@@ -451,6 +451,7 @@ PlaylistData * readerPlaylistsController (FILE *pFile) { // Retorna um vetor com
         rewind(pFile);
         return vector;
     }
+    return NULL;
 }
 
 int addPlaylistsController(char *name, FILE *controller) { // Adiciona uma nova playlist ao controlador
@@ -627,6 +628,7 @@ musica * readMusicsvector(FILE *pFile) { // Esta função lê o banco de música
         rewind(pFile);
         return vector;
     }
+    return NULL;
 }
 
 int musicsLength(FILE *pFile) { // Esta função retorna a quantidade de músicas dentro do banco de músicas
@@ -660,7 +662,7 @@ int isMusicInVector(musica music, musica *vector, int length) { // Verifica se u
 Sorts
 */
 void bubbleTypeSort(musica *vector, int type, int size) { // Um bubble sort capaz de sortear por diferentes condições
-    int ordened = 0, sortByValue1, sortByValue2;
+    int ordened = 0, sortByValue1 = 0, sortByValue2 = 0;
     musica aux, comp1, comp2;
     int value = size;
     if(size < 1)

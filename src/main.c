@@ -742,7 +742,7 @@ void add_actual_music_in_playlist(GtkButton *btn, gpointer user_data) {
 }
 
 void set_actual_music_in_playlist(GtkButton *btn, gpointer user_data) {
-    gint id = GPOINTER_TO_INT(user_data), index;
+    gint id = GPOINTER_TO_INT(user_data), index = -1;
     gchar sprintText[200];
     gint minutes, seconds;
     musica *vector = readMusicsvector(pActualPlaylistOpened);
@@ -764,6 +764,11 @@ void set_actual_music_in_playlist(GtkButton *btn, gpointer user_data) {
         if(vector[i].id == id)
             index = i;
 
+    if(index < 0) {
+        g_free(vector);
+        return;
+    }
+
     minutes = vector[index].tempo / 60;
     seconds = vector[index].tempo - minutes*60;
     sprintf(sprintText, "%d:%d minutos", minutes, seconds);
@@ -778,6 +783,7 @@ void set_actual_music_in_playlist(GtkButton *btn, gpointer user_data) {
     
     sprintf(sprintText, "%d", vector[index].id);
     change_label_text(fr2_access_label_view_id, sprintText);
+    g_free(vector);
 }
 
 void set_actual_music_in_list(GtkButton *btn, gpointer user_data) {
