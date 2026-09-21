@@ -1,43 +1,54 @@
-#ifndef FINAL_PROJECT_PROG2_PLAYLISTS_PLAYLISTS_H
-#define FINAL_PROJECT_PROG2_PLAYLISTS_PLAYLISTS_H
+#ifndef RESONANCE_LIBRARY_H
+#define RESONANCE_LIBRARY_H
 
+/*
+ * Data layer of Resonance: the song database, playlist files and sorting.
+ * Everything here is plain file I/O; the interface lives in main.c.
+ */
+
+#include <stdio.h>
+
+/* One record of files/musics_database.bin and of every playlist file.
+   The layout (sizes and order of the fields) is the on-disk format:
+   changing it makes existing files unreadable. */
 typedef struct {
-
-    char nome[200];
+    char title[200];
     char album[400];
-    char artista[200];
-    int tempo;
-    int id;
-
-} musica;
+    char artist[200];
+    int duration;    /* seconds */
+    int id;          /* position in data/musics.txt */
+} Song;
 
 #define PLAYLIST_NAME_MAX_CHARS 18 /* same limit as the name field in the interface */
 
+/* One record of files/playlists/playlist_registry.bin. */
 typedef struct {
     int id;          /* also names the file: files/playlists/playlist_<id>.bin */
     char name[100];  /* UTF-8, as typed by the user (after trimming) */
-} PlaylistData;
+} Playlist;
 
+// ================================================================================================
+// Songs (database and playlist files share the same record format)
 
-// ===========================================================================================
-// Funções de tratamento de arquivo
+int song_count(FILE *file);
+Song * read_songs(FILE *file);
+int truncate_file(FILE *file);
+int playlist_add_song(Song song, FILE *playlist_file);
+int playlist_remove_song(Song song, FILE *playlist_file);
 
-// Files
-int musicsLength(FILE * pFile);
-musica * readMusicsvector(FILE *pFile);
-int reinsFile(FILE *pFile);
-int addNewMusicInPlaylist(musica music, FILE *pFile);
-int delNewMusicInPlaylist(musica music, FILE *pFile);
-int createNewPlaylistFile(const char *name, FILE *controller);
-FILE * openPlaylistsController();
-FILE * acessPlaylistFile(int id);
-int getPlaylistByIndex(FILE *controller, int index, PlaylistData *out);
-PlaylistData * readerPlaylistsController (FILE *pFile);
-int lengthPlaylistsController(FILE *pFile);
-int removePlaylistsController(int id, FILE *controller);
+// ================================================================================================
+// Playlist registry
 
-//=================================================================================================
-// Sort
+FILE * registry_open(void);
+int registry_count(FILE *registry);
+Playlist * registry_read_all(FILE *registry);
+int registry_get(FILE *registry, int index, Playlist *out);
+int playlist_create(const char *name, FILE *registry);
+int playlist_delete(int id, FILE *registry);
+FILE * playlist_open(int id);
+
+// ================================================================================================
+// Sorting
 
 typedef enum {
     SORT_INSERTION, /* order in which songs were added (playlists only) */
@@ -48,6 +59,6 @@ typedef enum {
     SORT_ALBUM
 } SortMode;
 
-void sort_songs(musica *songs, int count, SortMode mode);
+void sort_songs(Song *songs, int count, SortMode mode);
 
-#endif // FINAL_PROJECT_PROG2_PLAYLISTS_PLAYLISTS_H
+#endif // RESONANCE_LIBRARY_H

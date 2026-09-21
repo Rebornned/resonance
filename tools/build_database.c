@@ -6,7 +6,7 @@
  *     album
  *     artist
  *     duration (m:ss)
- * and writes one fixed-size binary record per song (struct musica),
+ * and writes one fixed-size binary record per song (struct Song),
  * using the song's position in the file as its ID.
  *
  * Usage: build_database <input.txt> <output.bin>
@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
     /* Songs are validated and kept in memory first, so an invalid
        input never leaves a half-written database behind. */
     size_t capacity = 128, count = 0;
-    musica *songs = malloc(capacity * sizeof(musica));
+    Song *songs = malloc(capacity * sizeof(Song));
     if (songs == NULL) {
         fclose(in);
         fprintf(stderr, "out of memory\n");
@@ -91,7 +91,7 @@ int main(int argc, char *argv[]) {
 
         if (count == capacity) {
             capacity *= 2;
-            musica *grown = realloc(songs, capacity * sizeof(musica));
+            Song *grown = realloc(songs, capacity * sizeof(Song));
             if (grown == NULL) {
                 fprintf(stderr, "out of memory\n");
                 ok = 0;
@@ -100,18 +100,18 @@ int main(int argc, char *argv[]) {
             songs = grown;
         }
 
-        musica *song = &songs[count];
+        Song *song = &songs[count];
         memset(song, 0, sizeof(*song)); /* no uninitialized bytes in the file */
 
-        if (!copy_field(song->nome, sizeof(song->nome), title, "title", line_number - 3) ||
+        if (!copy_field(song->title, sizeof(song->title), title, "title", line_number - 3) ||
             !copy_field(song->album, sizeof(song->album), album, "album", line_number - 2) ||
-            !copy_field(song->artista, sizeof(song->artista), artist, "artist", line_number - 1)) {
+            !copy_field(song->artist, sizeof(song->artist), artist, "artist", line_number - 1)) {
             ok = 0;
             break;
         }
 
-        song->tempo = parse_duration(duration);
-        if (song->tempo < 0) {
+        song->duration = parse_duration(duration);
+        if (song->duration < 0) {
             fprintf(stderr, "line %d: invalid duration \"%s\" (expected m:ss)\n",
                     line_number, duration);
             ok = 0;
@@ -136,7 +136,7 @@ int main(int argc, char *argv[]) {
         free(songs);
         return EXIT_FAILURE;
     }
-    size_t written = fwrite(songs, sizeof(musica), count, out);
+    size_t written = fwrite(songs, sizeof(Song), count, out);
     int close_failed = fclose(out) != 0;
     free(songs);
 

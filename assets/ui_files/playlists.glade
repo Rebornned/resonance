@@ -315,8 +315,8 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkLabel" id="fr2_music_actual_sort">
-                        <property name="name">fr2_music_actual_sort</property>
+                      <object class="GtkLabel" id="fr2_music_current_sort">
+                        <property name="name">fr2_music_current_sort</property>
                         <property name="width-request">18</property>
                         <property name="height-request">38</property>
                         <property name="visible">True</property>
