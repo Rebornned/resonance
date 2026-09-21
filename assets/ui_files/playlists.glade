@@ -48,7 +48,7 @@
                 <property name="height-request">128</property>
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="label" translatable="yes">Ressonance</property>
+                <property name="label" translatable="yes">Resonance</property>
                 <style>
                   <class name="universal_font"/>
                   <class name="font_size_96"/>
