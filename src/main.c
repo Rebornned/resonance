@@ -8,9 +8,7 @@
 #include "playlists.h"
 
 // ************************************************************************************************
-// Compilação necessária
-// cd C:/Users/Amage/Desktop/Programacao/Playlists_Final_Prog2/Final_Project_Prog2_Playlists/bin/
-// gcc -o main.exe main.c func.c -mwindows `pkg-config --cflags --libs gtk+-3.0 glib-2.0 pango`
+// Build: see the Makefile in the project root (make / make run)
 
 // ================================================================================================
 // GtkStructures

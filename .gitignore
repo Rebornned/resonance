@@ -1,6 +1,5 @@
 # Build output
-bin/resonance
-bin/resonance.exe
+bin/
 *.o
 *.exe
 
