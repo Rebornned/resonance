@@ -50,18 +50,6 @@ int isMusicInVector(musica music, musica *vector, int length);
 void validateString(const char *string, char *validate);
 char * adornString(const char *string);
 // ===============================================================================================
-/*
-int main() {
-    FILE *resetDatabase = fopen("../files/musics_database.bin", "rb+");
-    reinsFile(resetDatabase);
-    for(int i=0; i < 98; i++) {
-        gravador(i);
-    }
-    printf("\n");
-    
-    return 0;
-}
-*/
 void ini_lista (playlist* nova) {
 
     nova->inicio = NULL;
@@ -105,54 +93,6 @@ int id (const char *nome, const char *artista, int tempo) { // aritmética para 
     return n;
 }
 
-void gravador (int index_num) { // função para gravar as músicas no arq binário
-    musica nova;
-    int v[1][2]; // tempo da musica antes de transformar em segundos
-
-    char inputStr[400];
-
-    FILE *gravados = fopen("../files/musics_database.bin", "ab+");
-    if (gravados == NULL) printf("Nao foi possivel abrir o arquivo de musicas.");
-
-    scanf(" %[^\n]" ,inputStr);
-    strcpy(nova.nome, inputStr);
-    getchar();
-
-    scanf(" %[^\n]" ,inputStr);
-    strcpy(nova.album, inputStr);
-    getchar();
-
-    scanf(" %[^\n]" ,inputStr);
-    strcpy(nova.artista, inputStr);
-    getchar();
-    
-    //printf("Insira o tempo da musica no formato [mm:ss]: \n");
-    scanf("%d:%d", &v[0][0], &v[0][1]);
-    getchar();
-
-    //printf("Insira o nome da musica: \n");
-    //fgets(nova.nome, sizeof(nova.nome), stdin);
-    //nova.nome[strcspn(nova.nome, "\n")] = 0;
-
-    //printf("Insira o nome do álbum: \n");
-    //fgets(nova.album, sizeof(nova.album), stdin);
-    //nova.album[strcspn(nova.album, "\n")] = 0;
-
-    //printf("Insira o nome do artista: \n");
-    //fgets(nova.artista, sizeof(nova.artista), stdin);
-    //nova.artista[strcspn(nova.artista, "\n")] = 0;
-
-
-    nova.tempo = segundos(v);
-    nova.id = index_num;
-    //nova.id = id(nova.nome, nova.artista, nova.tempo);
-    //printf("%s | %s | %d | %d | %s\n", nova.nome, nova.artista, nova.id, nova.tempo, nova.album);
-    if(fwrite(&nova, sizeof(musica), 1, gravados) == 1)
-        printf("Dados gravados com sucesso!\n");
-    
-    fclose(gravados);
-
-}
 
 musica *select_mostruario (playlist *pl) { // seleciona as musicas
 

@@ -39,7 +39,6 @@ int add (int base, int adicionar);
 
 int id (const char *nome, const char *artista, int tempo);
 
-void gravador (int index_num);
 
 musica *select_mostruario (playlist* pl); // seleciona as músicas que o usuário
 // pedir num vetor (eu chamei tanto pra apagar quanto pra excluir as musicas selecionadas em outras funções)
