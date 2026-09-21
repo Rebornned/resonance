@@ -1,11 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <locale.h>
 #include <string.h>
 #include <gtk/gtk.h>
 #include <glib.h>
-#include <math.h>
 #include "playlists.h"
+
+// Text shown in the sort labels, indexed by SortMode
+static const gchar *SORT_LABELS[] = {
+    [SORT_INSERTION] = "Inserção",
+    [SORT_ID]        = "ID",
+    [SORT_DURATION]  = "Duração",
+    [SORT_TITLE]     = "Alfabética",
+    [SORT_ARTIST]    = "Artista",
+    [SORT_ALBUM]     = "Álbum",
+};
 
 // ************************************************************************************************
 // Build: see the Makefile in the project root (make / make run)
@@ -22,10 +30,6 @@ typedef struct {
     gint interactions;
 } GtkUpAnimationData;
 
-typedef struct {
-    musica *vector;
-    gint index;
-}  GtkVectorData;
 
 // +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=++=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=++=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 // Funções referentes a tela
@@ -42,7 +46,7 @@ void setting_musics_list_add(gpointer data);
 
 // Edição
 void add_actual_music_in_playlist(GtkButton *btn, gpointer user_data);
-void change_label_text(GtkLabel *label, gchar *text);
+void change_label_text(GtkLabel *label, const gchar *text);
 void set_actual_music_in_playlist(GtkButton *btn, gpointer user_data);
 void set_button_text_with_limit(GtkWidget *button, const char *text);
 void set_actual_music_in_list(GtkButton *btn, gpointer user_data);
@@ -94,7 +98,6 @@ FILE * pActualPlaylistOpened;
 int main (int argc, char *argv[]) {
     // Inicialização da tela
     // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-    setlocale(LC_ALL, "en_US.utf8");
     gtk_init(&argc, &argv); // Init gtk
 
     // Inicialização dos ponteiros GTK
@@ -171,6 +174,7 @@ int main (int argc, char *argv[]) {
 Inicializations */
 
 void switchPage(GtkButton *btn, gpointer user_data) {
+    (void)user_data;
     GtkStack *fr2_stack = GTK_STACK(gtk_builder_get_object(builder, "fr2_stack"));
     GtkStack *fr2_add_stack = GTK_STACK(gtk_builder_get_object(builder, "fr2_add_stack"));
     GtkStack *fr2_stack_access = GTK_STACK(gtk_builder_get_object(builder, "fr2_stack_access"));
@@ -347,16 +351,19 @@ void switchPage(GtkButton *btn, gpointer user_data) {
         GtkFixed *fixed = GTK_FIXED(gtk_builder_get_object(builder, "fr2_main"));
         gint length = musicsLength(pActualPlaylistOpened);
         musica delMusic;
+        gboolean found = FALSE;
         musica *vector = readMusicsvector(pActualPlaylistOpened);
         for(int i=0; i < length; i++) {
             if(atoi(gtk_label_get_text(labelId)) == vector[i].id) {
                 delMusic = vector[i];
+                found = TRUE;
             }
         }
         
         g_snprintf(color, sizeof(color), "CB0000");
+        g_snprintf(message, sizeof(message), "Ocorreu um erro no arquivo.");
         button_set_click_animation(GTK_WIDGET(btn));
-        gint status = delNewMusicInPlaylist(delMusic, pActualPlaylistOpened);
+        gint status = found ? delNewMusicInPlaylist(delMusic, pActualPlaylistOpened) : -3;
 
         if(status == 1) {
             g_snprintf(message, sizeof(message), "Música apagada com sucesso!");
@@ -364,8 +371,8 @@ void switchPage(GtkButton *btn, gpointer user_data) {
             setting_playlist_music_list(GINT_TO_POINTER(0));
             gtk_stack_set_visible_child_name(fr2_stack_access, "page_access_list");
         }
-        if(status == -2)
-            g_snprintf(message, sizeof(message), "Ocorreu um erro no arquivo.");
+        if(status == -3)
+            g_snprintf(message, sizeof(message), "A música não está na playlist.");
         
         logStartAnimation(message, color, 1500, 21, 665, 163, 158, 20, fixed);
         g_free(vector);
@@ -446,34 +453,17 @@ void setting_musics_list(gpointer data) {
     turn_off_button_start(GTK_WIDGET(btn));
 
     GtkLabel * fr2_music_actual_sort = GTK_LABEL(gtk_builder_get_object(builder, "fr2_music_actual_sort"));
-    gint typeSort = 1;
-    const gchar *sortText = gtk_label_get_text(fr2_music_actual_sort);
 
-    if(strcmp(sortText, "ID") == 0) {
-        typeSort = 2;
-        change_label_text(fr2_music_actual_sort, "Duração");
-    }
-    else if(strcmp(sortText, "Duração") == 0) {
-        typeSort = 3;
-        change_label_text(fr2_music_actual_sort, "Alfabética");
-    }
-    else if(strcmp(sortText, "Alfabética") == 0) {
-        typeSort = 4;
-        change_label_text(fr2_music_actual_sort, "Artista");
-    }
-    else if(strcmp(sortText, "Artista") == 0) {
-        typeSort = 5;
-        change_label_text(fr2_music_actual_sort, "Álbum");
-    }
-    else if(strcmp(sortText, "Álbum") == 0) {
-        typeSort = 1;
-        change_label_text(fr2_music_actual_sort, "ID");
-    }
+    // Each click moves to the next criterion: ID, duration, title, artist, album, then ID again.
+    // Starts at SORT_ALBUM to match the initial label in the .glade file, so the first call sorts by ID.
+    static SortMode song_list_sort = SORT_ALBUM;
+    song_list_sort = (song_list_sort == SORT_ALBUM) ? SORT_ID : song_list_sort + 1;
+    change_label_text(fr2_music_actual_sort, SORT_LABELS[song_list_sort]);
 
     int length = musicsLength(pMusicsDatabase);
     GtkFixed *fixed = GTK_FIXED(gtk_builder_get_object(builder, "fr2_musics_list_fixed"));
     
-    bubbleTypeSort(pMusicsDatabaseVector, typeSort, length);
+    sort_songs(pMusicsDatabaseVector, length, song_list_sort);
     set_actual_music_in_list(NULL, GINT_TO_POINTER(0));
 
     for(int i=0; i < length; i++) {
@@ -500,7 +490,7 @@ void setting_musics_list(gpointer data) {
 }
 
 void setting_musics_list_add(gpointer data) {
-    gint setting = GPOINTER_TO_INT(data);
+    (void)data;
     gint length = musicsLength(pMusicsDatabase);
     GtkFixed * fixed = GTK_FIXED(gtk_builder_get_object(builder, "fr2_access_add_fixed"));
     gint actualLength = length;
@@ -608,7 +598,6 @@ void setting_playlist_music_list(gpointer data) {
     gint length = musicsLength(pActualPlaylistOpened);
     GtkFixed * fixed = GTK_FIXED(gtk_builder_get_object(builder, "fr2_access_list_fixed"));
     gint actualLength = length;
-    gint typeSort = 0;
     GtkWidget *secondSort = GTK_WIDGET(gtk_builder_get_object(builder, "fr2_btn_playlist_music_sort"));
     turn_off_button_start(secondSort);
     button_set_click_animation(secondSort);
@@ -618,41 +607,19 @@ void setting_playlist_music_list(gpointer data) {
     
     musica * playlistMusicsVector = readMusicsvector(pActualPlaylistOpened);
     GtkLabel *fr2_access_sort = GTK_LABEL(gtk_builder_get_object(builder, "fr2_access_sort"));
-    const gchar *sortText = gtk_label_get_text(fr2_access_sort);
-    
-    if(setting == 0) {
-        typeSort = 0;
-        change_label_text(fr2_access_sort, "Inserção");
-    }
-    if(setting != 0) {
-        button_set_click_animation(GTK_WIDGET(fr2_access_sort));
-        if(strcmp(sortText, "Inserção") == 0) {
-            typeSort = 1;
-            change_label_text(fr2_access_sort, "ID");
-        }
-        else if(strcmp(sortText, "ID") == 0) {
-            typeSort = 2;
-            change_label_text(fr2_access_sort, "Duração");
-        }
-        else if(strcmp(sortText, "Duração") == 0) {
-            typeSort = 3;
-            change_label_text(fr2_access_sort, "Alfabética");
-        }
-        else if(strcmp(sortText, "Alfabética") == 0) {
-            typeSort = 4;
-            change_label_text(fr2_access_sort, "Artista");
-        }
-        else if(strcmp(sortText, "Artista") == 0) {
-            typeSort = 5;
-            change_label_text(fr2_access_sort, "Álbum");
-        }
-        else if(strcmp(sortText, "Álbum") == 0) {
-            typeSort = 0;
-            change_label_text(fr2_access_sort, "Inserção");
-        }
-    }
 
-    bubbleTypeSort(playlistMusicsVector, typeSort, actualLength);
+    // setting 0 (playlist opened or changed) resets to insertion order;
+    // a click on the sort button moves to the next criterion.
+    static SortMode playlist_sort = SORT_INSERTION;
+    if(setting == 0)
+        playlist_sort = SORT_INSERTION;
+    else {
+        button_set_click_animation(GTK_WIDGET(fr2_access_sort));
+        playlist_sort = (playlist_sort == SORT_ALBUM) ? SORT_INSERTION : playlist_sort + 1;
+    }
+    change_label_text(fr2_access_sort, SORT_LABELS[playlist_sort]);
+
+    sort_songs(playlistMusicsVector, actualLength, playlist_sort);
     gtk_widget_set_sensitive(GTK_WIDGET(fixed), FALSE);
     clear_buttons_from_fixed(fixed);
 
@@ -690,7 +657,7 @@ void setting_playlist_music_list(gpointer data) {
     }
     gtk_widget_show_all(GTK_WIDGET(fixed));
     gtk_widget_set_sensitive(GTK_WIDGET(fixed), TRUE);
-    //g_free(playlistMusicsVector);
+    g_free(playlistMusicsVector);
 }
 
 /*
@@ -742,10 +709,15 @@ void add_actual_music_in_playlist(GtkButton *btn, gpointer user_data) {
     gchar message[300], color[100];
     GtkFixed *fixed = GTK_FIXED(gtk_builder_get_object(builder, "fr2_main"));
     GtkStack *fr2_stack_access = GTK_STACK(gtk_builder_get_object(builder, "fr2_stack_access"));
-    gint length = musicsLength(pMusicsDatabase);
     musica *vector = readMusicsvector(pMusicsDatabase);
     g_snprintf(color, sizeof(color), "CB0000");
+    g_snprintf(message, sizeof(message), "Ocorreu um erro ao inserir a música.");
     button_set_click_animation(GTK_WIDGET(btn));
+    if(vector == NULL || index < 0 || index >= musicsLength(pMusicsDatabase)) {
+        logStartAnimation(message, color, 1500, 21, 665, 163, 158, 20, fixed);
+        g_free(vector);
+        return;
+    }
     musica addMusic = vector[index];
     gint status = addNewMusicInPlaylist(addMusic, pActualPlaylistOpened);
 
@@ -860,7 +832,7 @@ void set_actual_playlist_in_list(GtkButton *btn, gpointer user_data) {
     
 }
 
-void change_label_text(GtkLabel *label, gchar *text) {
+void change_label_text(GtkLabel *label, const gchar *text) {
     gtk_label_set_text(label, text);
 }
 
@@ -945,10 +917,16 @@ gboolean logAnimation(gpointer data) {
 }
 
 static void set_cursor_window(GtkWidget *widget, gpointer data) {
+    (void)widget;
+    (void)data;
     GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file("../assets/ui_images/cursor.png", NULL);
+    if(pixbuf == NULL)
+        return; // keep the default cursor if the image is missing
     GdkCursor *cursor = gdk_cursor_new_from_pixbuf(gdk_display_get_default(), pixbuf, 0, 0);
 
     gdk_window_set_cursor(gtk_widget_get_window(window), cursor);
+    g_object_unref(cursor);
+    g_object_unref(pixbuf);
 }
 
 /*=============================================================================================*/

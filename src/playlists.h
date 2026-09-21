@@ -11,21 +11,6 @@ typedef struct {
 
 } musica;
 
-typedef struct nodo {
-
-    musica dados;
-    struct nodo* prox;
-
-} nodo;
-
-typedef struct {
-
-    nodo* inicio;
-    nodo* fim;
-    int tamanho;
-
-} playlist;
-
 #define PLAYLIST_NAME_MAX_CHARS 18 /* same limit as the name field in the interface */
 
 typedef struct {
@@ -34,31 +19,13 @@ typedef struct {
 } PlaylistData;
 
 
-void ini_lista (playlist* nova);
-
-int segundos (int v[][2]);
-
-int add (int base, int adicionar);
-
-int id (const char *nome, const char *artista, int tempo);
-
-
-musica *select_mostruario (playlist* pl); // seleciona as músicas que o usuário
-// pedir num vetor (eu chamei tanto pra apagar quanto pra excluir as musicas selecionadas em outras funções)
-
-void apagar_musica_bin (void);
-
-void add_playlist (playlist *nova);
-
-void apagar_playlist (playlist *pl);
-
 // ===========================================================================================
 // Funções de tratamento de arquivo
 
 // Files
 int musicsLength(FILE * pFile);
 musica * readMusicsvector(FILE *pFile);
-void reinsFile(FILE *pFile);
+int reinsFile(FILE *pFile);
 int addNewMusicInPlaylist(musica music, FILE *pFile);
 int delNewMusicInPlaylist(musica music, FILE *pFile);
 int createNewPlaylistFile(const char *name, FILE *controller);
@@ -68,20 +35,19 @@ int getPlaylistByIndex(FILE *controller, int index, PlaylistData *out);
 PlaylistData * readerPlaylistsController (FILE *pFile);
 int lengthPlaylistsController(FILE *pFile);
 int removePlaylistsController(int id, FILE *controller);
-int printMusicsInPlaylist(FILE *pFile);
 
 //=================================================================================================
 // Sort
 
-void bubbleTypeSort(musica *vector, int type, int size);
-int sortCompName(const void *a, const void *b);
-int sortCompArtist(const void *a, const void *b);
-int sortCompAlbum(const void *a, const void *b);
-//================================================================================================
-// Searchs
-int sequencialSearch(int num, int vector[], int length);
-int isMusicInVector(musica music, musica *vector, int length);
+typedef enum {
+    SORT_INSERTION, /* order in which songs were added (playlists only) */
+    SORT_ID,
+    SORT_DURATION,
+    SORT_TITLE,
+    SORT_ARTIST,
+    SORT_ALBUM
+} SortMode;
 
-//================================================================================================
+void sort_songs(musica *songs, int count, SortMode mode);
 
 #endif // FINAL_PROJECT_PROG2_PLAYLISTS_PLAYLISTS_H
