@@ -162,7 +162,8 @@ int main (int argc, char *argv[]) {
 
     fclose(pMusicsDatabase);
     fclose(pPlaylistController);
-    fclose(pActualPlaylistOpened);
+    if(pActualPlaylistOpened != NULL)
+        fclose(pActualPlaylistOpened);
     return 0;
 }
 /*
@@ -229,18 +230,18 @@ void switchPage(GtkButton *btn, gpointer user_data) {
 
     if (g_strcmp0(button_name, "fr2_btn_add_new_playlist") == 0) {
         gchar message[300], color[100];
-        char entryText[50];
+        gchar entryText[100];
         button_set_click_animation(GTK_WIDGET(btn));
         GtkFixed *fixed = GTK_FIXED(gtk_builder_get_object(builder, "fr2_main"));
         GtkEntry *entry = GTK_ENTRY(gtk_builder_get_object(builder, "fr2_entry_playlist_name"));
-        strcpy(entryText, gtk_entry_get_text(entry));
+        g_strlcpy(entryText, gtk_entry_get_text(entry), sizeof(entryText));
         g_snprintf(color, sizeof(color), "CB0000");
         if(gtk_entry_get_text_length(entry) == 0) 
             g_snprintf(message, sizeof(message), "Campo vazio, Preencha o nome para a playlist.");
         else {
             int status = createNewPlaylistFile(entryText, pPlaylistController);
             if(status == -3)
-                g_snprintf(message, sizeof(message), "Não são permitidos caracteres especiais.");
+                g_snprintf(message, sizeof(message), "Use apenas letras, números e espaços.");
             if(status == -2)
                 g_snprintf(message, sizeof(message), "Ocorreu um erro na criação da playlist, tente novamente.");
             if(status == -1)
@@ -266,11 +267,18 @@ void switchPage(GtkButton *btn, gpointer user_data) {
     // Playlist Access and Delete
     if (g_strcmp0(button_name, "fr2_btn_delete_playlist") == 0) {
         GtkFixed *fixed = GTK_FIXED(gtk_builder_get_object(builder, "fr2_main"));
-        gchar message[300], color[100], nameFile[100];
+        gchar message[300], color[100];
+        PlaylistData selected;
+        gint status = -2;
         button_set_click_animation(GTK_WIDGET(btn));
-        strcpy(nameFile, gtk_button_get_label(GTK_BUTTON(fr2_playlists_btns_vector[playlistIndex])));
-        FILE *newPlaylistFile = acessPlaylistFile(nameFile);
-        gint status = removePlaylistsController(nameFile, pPlaylistController, newPlaylistFile);
+        if(getPlaylistByIndex(pPlaylistController, playlistIndex, &selected)) {
+            // Close the last opened playlist first: Windows cannot delete an open file
+            if(pActualPlaylistOpened != NULL) {
+                fclose(pActualPlaylistOpened);
+                pActualPlaylistOpened = NULL;
+            }
+            status = removePlaylistsController(selected.id, pPlaylistController);
+        }
 
         g_snprintf(color, sizeof(color), "CB0000");
         
@@ -279,7 +287,7 @@ void switchPage(GtkButton *btn, gpointer user_data) {
         if(status == -2)
             g_snprintf(message, sizeof(message), "A playlist não existe.");
         if(status == 1) {
-            g_snprintf(message, sizeof(message), "A playlist '%s' foi apagada com sucesso!", nameFile);
+            g_snprintf(message, sizeof(message), "A playlist '%s' foi apagada com sucesso!", selected.name);
             g_snprintf(color, sizeof(color), "1FD660");
             setting_playlist_list(GINT_TO_POINTER(1));
         }
@@ -289,10 +297,15 @@ void switchPage(GtkButton *btn, gpointer user_data) {
     if (g_strcmp0(button_name, "fr2_btn_access_playlist") == 0) {
         GtkFixed *fixed = GTK_FIXED(gtk_builder_get_object(builder, "fr2_main"));
         GtkLabel *label = GTK_LABEL(gtk_builder_get_object(builder, "fr2_playlist_view_name"));
-        gchar message[300], color[100], nameFile[100];
-        strcpy(nameFile, gtk_button_get_label(GTK_BUTTON(fr2_playlists_btns_vector[playlistIndex])));
+        gchar message[300], color[100];
+        PlaylistData selected;
         button_set_click_animation(GTK_WIDGET(btn));
-        pActualPlaylistOpened = acessPlaylistFile(nameFile);
+        if(pActualPlaylistOpened != NULL) {
+            fclose(pActualPlaylistOpened);
+            pActualPlaylistOpened = NULL;
+        }
+        if(getPlaylistByIndex(pPlaylistController, playlistIndex, &selected))
+            pActualPlaylistOpened = acessPlaylistFile(selected.id);
         
         if(pActualPlaylistOpened == NULL) {
             g_snprintf(color, sizeof(color), "CB0000");
@@ -302,14 +315,17 @@ void switchPage(GtkButton *btn, gpointer user_data) {
         else {
             gtk_stack_set_transition_type(fr2_stack, GTK_STACK_TRANSITION_TYPE_CROSSFADE);
             setting_playlist_music_list(GINT_TO_POINTER(0));
-            change_label_text(label, nameFile);
+            change_label_text(label, selected.name);
             gtk_stack_set_visible_child_name(fr2_stack, "page_access");
             gtk_stack_set_visible_child_name(fr2_stack_access, "page_access_list");
         }
     }
 
     if (g_strcmp0(button_name, "fr2_btn_access_back") == 0) {
-        fclose(pActualPlaylistOpened);
+        if(pActualPlaylistOpened != NULL) {
+            fclose(pActualPlaylistOpened);
+            pActualPlaylistOpened = NULL;
+        }
         button_set_click_animation(GTK_WIDGET(btn));
         gtk_stack_set_visible_child_name(fr2_stack, "page_playlist");
     }
@@ -543,6 +559,14 @@ void setting_playlist_list(gpointer data) {
         length = 4;
 
     PlaylistData * playlistVector = readerPlaylistsController(pPlaylistController);
+
+    // One button per playlist: grow the array when playlists are added
+    GtkWidget **grown = realloc(fr2_playlists_btns_vector, sizeof(GtkWidget *) * length);
+    if(grown == NULL) {
+        g_free(playlistVector);
+        return;
+    }
+    fr2_playlists_btns_vector = grown;
     gtk_widget_set_sensitive(GTK_WIDGET(fixed), FALSE);
     
     if(setting == 1) {
@@ -843,12 +867,12 @@ void change_label_text(GtkLabel *label, gchar *text) {
 void set_button_text_with_limit(GtkWidget *button, const char *text) {
     const int max_length = 18;
 
-    char truncated_text[max_length + 4]; 
+    char truncated_text[max_length * 4 + 4]; // up to 4 bytes per UTF-8 character, plus "..."
     if (g_utf8_strlen(text, -1) > max_length) {
         g_utf8_strncpy(truncated_text, text, max_length); 
         strcat(truncated_text, "...");
     } else {
-        strcpy(truncated_text, text);
+        g_strlcpy(truncated_text, text, sizeof(truncated_text));
     }
 
     if(GTK_IS_BUTTON(button)) {

@@ -26,8 +26,11 @@ typedef struct {
 
 } playlist;
 
+#define PLAYLIST_NAME_MAX_CHARS 18 /* same limit as the name field in the interface */
+
 typedef struct {
-    char name[100];
+    int id;          /* also names the file: files/playlists/playlist_<id>.bin */
+    char name[100];  /* UTF-8, as typed by the user (after trimming) */
 } PlaylistData;
 
 
@@ -58,14 +61,13 @@ musica * readMusicsvector(FILE *pFile);
 void reinsFile(FILE *pFile);
 int addNewMusicInPlaylist(musica music, FILE *pFile);
 int delNewMusicInPlaylist(musica music, FILE *pFile);
-int playlistFileExists(char *name);
-int createNewPlaylistFile(char *name, FILE *controller);
+int createNewPlaylistFile(const char *name, FILE *controller);
 FILE * openPlaylistsController();
-FILE * acessPlaylistFile(char *name);
-int addPlaylistsController(char *name, FILE *controller);
+FILE * acessPlaylistFile(int id);
+int getPlaylistByIndex(FILE *controller, int index, PlaylistData *out);
 PlaylistData * readerPlaylistsController (FILE *pFile);
 int lengthPlaylistsController(FILE *pFile);
-int removePlaylistsController(char *name, FILE *controller, FILE *removeFile);
+int removePlaylistsController(int id, FILE *controller);
 int printMusicsInPlaylist(FILE *pFile);
 
 //=================================================================================================
